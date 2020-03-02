@@ -4,21 +4,27 @@ using UnityEngine;
 
 public class WorldController : MonoBehaviour
 {
-    public Sprite floorSprite;
+    // "Instance" is a property used to ensure there is only one WC
+    public static WorldController Instance { get; protected set; }
+    public World World { get; protected set; }
 
-    World world;
+    public Sprite floorSprite;
 
     // Start is called before the first frame update
     void Start()
     {
-        world = new World();
+        if( Instance != null )
+            Debug.LogError("WorldController - Another WorldController already exists.");
+        Instance = this;
+
+        World = new World();
 
         // Create a game object for each tile
-        for( int x = 0; x < world.Width; x++ )
+        for( int x = 0; x < World.Width; x++ )
         {
-            for( int y = 0; y < world.Height; y++ )
+            for( int y = 0; y < World.Height; y++ )
             {
-                Tile tile_data = world.GetTileAt(x, y);
+                Tile tile_data = World.GetTileAt(x, y);
 
                 // create game object, name it according to position,
                 // then move the object to correct position
@@ -37,7 +43,7 @@ public class WorldController : MonoBehaviour
             }
         }
 
-        world.RandomizeTiles();
+        World.RandomizeTiles();
     }
 
 void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
