@@ -5,6 +5,9 @@ using UnityEngine;
 public class WorldController : MonoBehaviour
 {
     public Sprite floorSprite;
+    public Sprite grassSprite;
+    public Sprite waterSprite;
+    public Sprite dirtSprite;
 
     World world;
 
@@ -14,9 +17,9 @@ public class WorldController : MonoBehaviour
         world = new World();
 
         // Create a game object for each tile
-        for( int x = 0; x < world.Width; x++ )
+        for (int x = 0; x < world.Width; x++)
         {
-            for( int y = 0; y < world.Height; y++ )
+            for (int y = 0; y < world.Height; y++)
             {
                 Tile tile_data = world.GetTileAt(x, y);
 
@@ -37,22 +40,28 @@ public class WorldController : MonoBehaviour
             }
         }
 
-        world.RandomizeTiles();
+        world.Generate();
     }
 
 void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
     {
-        if( tile_data.Type == Tile.TileType.Floor )
+        switch (tile_data.Type)
         {
-            tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
-        }
-        else if( tile_data.Type == Tile.TileType.Empty )
-        {
-            tile_go.GetComponent<SpriteRenderer>().sprite = null;
-        }
-        else
-        {
-            Debug.LogError("OnTileTypeChanged - Unrecognized TileType.");
+            case Tile.TileType.Floor:
+                tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
+                break;
+            case Tile.TileType.Grass:
+                tile_go.GetComponent<SpriteRenderer>().sprite = grassSprite;
+                break;
+            case Tile.TileType.Water:
+                tile_go.GetComponent<SpriteRenderer>().sprite = waterSprite;
+                break;
+            case Tile.TileType.Dirt:
+                tile_go.GetComponent<SpriteRenderer>().sprite = dirtSprite;
+                break;
+            default:
+                tile_go.GetComponent<SpriteRenderer>().sprite = null;
+                break;
         }
     }
 }

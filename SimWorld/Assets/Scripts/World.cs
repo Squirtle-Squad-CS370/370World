@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-
+using System.Collections;
 
 public class World // maintain monobehaviour inheritance for use of Start()
 {
@@ -16,6 +16,7 @@ public class World // maintain monobehaviour inheritance for use of Start()
             return width;
         }
     }
+    
     private int height; // height of the map, measured in tiles
     public int Height
     {
@@ -42,6 +43,7 @@ public class World // maintain monobehaviour inheritance for use of Start()
                 tileGrid[x, y] = new Tile(this, x, y);
             }
         }
+        
         Debug.Log("World created with " + (width * height) + " tiles.");
     }
 
@@ -53,7 +55,10 @@ public class World // maintain monobehaviour inheritance for use of Start()
     public Tile GetTileAt(int x, int y)
     {
         if (tileGrid[x, y] == null)
+        {
             tileGrid[x, y] = new Tile(this, x, y);
+        }
+        
         return tileGrid[x, y];
     }
     */
@@ -66,23 +71,47 @@ public class World // maintain monobehaviour inheritance for use of Start()
             Debug.LogError("Tile (" + x + ", " + y + ") is out of range.");
             return null;
         }
+        
         return tileGrid[x, y];
     }
-
-    public void RandomizeTiles()
+    
+    public void Generate() 
     {
-        for( int x = 0; x < width; x++ )
+        int seed = System.DateTime.Now.Millisecond;
+        
+        UnityEngine.Random.InitState(seed);
+        CreateGround(seed);
+    }
+
+    public void CreateGround(int seed)
+    {
+        float scale = 2.5F;
+        for (int x = 0; x < width; x++)
         {
-            for( int y = 0; y < height; y++ )
+            for (int y = 0; y < height; y++)
             {
-                if (UnityEngine.Random.Range(0, 2) == 0)
-                    tileGrid[x, y].Type = Tile.TileType.Empty;
+                float xcoord = (((float)x / width) * scale) + seed;
+                float ycoord = (((float)y / height) * scale) + seed;
+                float val = Mathf.PerlinNoise(xcoord, ycoord) * 10;
+
+                if (val >= 0 && val <= 2) 
+                {
+                    tileGrid[x, y].Type = Tile.TileType.Dirt;
+                }
+                else if (val > 2 && val <= 8)
+                {
+                    tileGrid[x, y].Type = Tile.TileType.Grass;
+                }
+                else if (val > 8)
+                {
+                    tileGrid[x, y].Type = Tile.TileType.Water;
+                }
                 else
+                {
                     tileGrid[x, y].Type = Tile.TileType.Floor;
+                }
             }
         }
         Debug.Log("Tiles Randomized");
     }
-
 }
-

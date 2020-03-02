@@ -161,6 +161,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: {x: 0, y: 0, z: -10}
+  smoothSpeed: 2
+  minOrtho: 1
+  maxOrtho: 20
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -248,6 +251,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorSprite: {fileID: 21300000, guid: 13f76d0ff7dfec3439ca66d9be7313c6, type: 3}
+  grassSprite: {fileID: 21300000, guid: 78510a2b2aba6461b8457d68616b45d0, type: 3}
+  waterSprite: {fileID: 21300000, guid: 7175c220caf984978beb8e78f0fd03d6, type: 3}
+  dirtSprite: {fileID: 21300000, guid: 640383645846e46e897c6253d37e8176, type: 3}
 --- !u!4 &771407876
 Transform:
   m_ObjectHideFlags: 0

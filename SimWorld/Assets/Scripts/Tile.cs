@@ -9,7 +9,7 @@ public class Tile
     int x;
     int y;
 
-    public enum TileType { Empty, Floor };
+    public enum TileType {Empty, Floor, Grass, Water, Dirt};
     private TileType type = TileType.Empty;
 
     // Callback function for when tile changes type to inform other code
@@ -27,8 +27,10 @@ public class Tile
             type = value;
             // Since tileType has changed, update its sprite & other things
             // Use the "callback" function to tell stuff we changed
-            if ( TileTypeChanged != null )
+            if (TileTypeChanged != null) 
+            {
                 TileTypeChanged(this);
+            }
         }
     }
     public int X
