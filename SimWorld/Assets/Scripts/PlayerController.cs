@@ -2,8 +2,11 @@
 
 public class PlayerController : MonoBehaviour
 {
+    private const float MOVE_SPEED = 5F;
     [SerializeField]
-    private float moveSpeed = 5f;
+    private float moveSpeed = MOVE_SPEED;
+    [SerializeField]
+    private float runSpeed = 8f;
 
     [SerializeField]
     private Rigidbody2D rb;
@@ -22,6 +25,15 @@ public class PlayerController : MonoBehaviour
     // We collect player input in this method
     void Update()
     {
+        if (Input.GetKey(KeyCode.LeftShift)) 
+        {
+            moveSpeed = runSpeed;
+        }
+        else
+        {
+            moveSpeed = MOVE_SPEED;
+        }
+        
         // by default, getAxisRaw() responds to both arrow keys & WASD
         moveInput.x = Input.GetAxisRaw("Horizontal"); // (left = -1) (right = 1)
         moveInput.y = Input.GetAxisRaw("Vertical"); // (up = 1) (down = -1);

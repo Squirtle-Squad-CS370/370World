@@ -9,10 +9,34 @@ public class CameraController : MonoBehaviour
 
     private Vector3 currentVelocity = Vector3.zero;
     private Vector3 desiredPosition;
+    private float zoomSpeed = 10;
+    private float targetOrtho;
+    public float smoothSpeed = 2.0f;
+    public float minOrtho = 1.0f;
+    public float maxOrtho = 1000.0f;
 
     void Start()
     {
         target = GameObject.FindGameObjectWithTag("Player").transform;
+        targetOrtho = Camera.main.orthographicSize;
+    }
+
+    void Update() 
+    {
+        //Added the ability to zoom out just so I can see what the world looks like.
+        float scroll = Input.GetAxis ("Mouse ScrollWheel");
+        if (scroll != 0.0f) 
+        {
+            targetOrtho -= scroll * zoomSpeed;
+             
+            if (targetOrtho < 1) 
+            {
+                targetOrtho = 1;
+            }
+            //targetOrtho = Mathf.Clamp(targetOrtho, minOrtho, maxOrtho);
+        }
+         
+         Camera.main.orthographicSize = Mathf.MoveTowards(Camera.main.orthographicSize, targetOrtho, smoothSpeed);
     }
 
     void LateUpdate() // we use LateUpdate because player position may have moved in the same update frame

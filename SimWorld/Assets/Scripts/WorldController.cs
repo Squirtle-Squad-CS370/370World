@@ -7,7 +7,10 @@ public class WorldController : MonoBehaviour
     // "Instance" is a property used to ensure there is only one WC
     public static WorldController Instance { get; protected set; }
     public World World { get; protected set; }
-
+    public Sprite floorSprite;
+    public Sprite grassSprite;
+    public Sprite waterSprite;
+    public Sprite dirtSprite;
     public Sprite floorSprite;
 
     // Start is called before the first frame update
@@ -20,9 +23,9 @@ public class WorldController : MonoBehaviour
         World = new World();
 
         // Create a game object for each tile
-        for( int x = 0; x < World.Width; x++ )
+        for (int x = 0; x < world.Width; x++)
         {
-            for( int y = 0; y < World.Height; y++ )
+            for (int y = 0; y < world.Height; y++)
             {
                 Tile tile_data = World.GetTileAt(x, y);
 
@@ -42,23 +45,29 @@ public class WorldController : MonoBehaviour
                 tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); } );
             }
         }
-
-        World.RandomizeTiles();
+        
+        world.Generate();
     }
 
 void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
     {
-        if( tile_data.Type == Tile.TileType.Floor )
+        switch (tile_data.Type)
         {
-            tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
-        }
-        else if( tile_data.Type == Tile.TileType.Empty )
-        {
-            tile_go.GetComponent<SpriteRenderer>().sprite = null;
-        }
-        else
-        {
-            Debug.LogError("OnTileTypeChanged - Unrecognized TileType.");
+            case Tile.TileType.Floor:
+                tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
+                break;
+            case Tile.TileType.Grass:
+                tile_go.GetComponent<SpriteRenderer>().sprite = grassSprite;
+                break;
+            case Tile.TileType.Water:
+                tile_go.GetComponent<SpriteRenderer>().sprite = waterSprite;
+                break;
+            case Tile.TileType.Dirt:
+                tile_go.GetComponent<SpriteRenderer>().sprite = dirtSprite;
+                break;
+            default:
+                tile_go.GetComponent<SpriteRenderer>().sprite = null;
+                break;
         }
     }
 }
