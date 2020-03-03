@@ -51,6 +51,6 @@ public class MouseManager : MonoBehaviour
         int x = Mathf.RoundToInt(coord.x);
         int y = Mathf.RoundToInt(coord.y);
 
-        return WorldController.Instance.world.GetTileAt(x, y);
+        return WorldController.Instance.World.GetTileAt(x, y);
     }
 }

@@ -6,7 +6,17 @@ public class WorldController : MonoBehaviour
 {
     // "Instance" is a property used to ensure there is only one WC
     public static WorldController Instance { get; protected set; }
-    public World world { get; protected set; }
+    private World world;
+    public World World 
+    { 
+        get 
+        {
+            return world;
+        }
+        
+        protected set {}
+    }
+    
     public Sprite floorSprite;
     public Sprite grassSprite;
     public Sprite waterSprite;
