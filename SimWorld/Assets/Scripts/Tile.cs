@@ -64,4 +64,9 @@ public class Tile
         TileTypeChanged += callback;
         // the use of += means we can call a whole list of functions! very cool
     }
+    // Unused currently but just in case ¯\_(ツ)_/¯
+    public void UnregisterTiletypeChangedCallback(Action<Tile> callback)
+    {
+        TileTypeChanged -= callback;
+    }
 }

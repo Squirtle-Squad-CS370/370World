@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class WorldController : MonoBehaviour
@@ -16,23 +17,43 @@ public class WorldController : MonoBehaviour
         
         protected set {}
     }
-    
+
+    // This will keep track of tile data and GameObject pairs
+    Dictionary<Tile, GameObject> tileGameObjectMap;
+
     public Sprite floorSprite;
     public Sprite grassSprite;
     public Sprite waterSprite;
     public Sprite dirtSprite;
 
-    // Start is called before the first frame update
-    void Start()
+    #region Singleton
+
+    // Awake is called even before Start(). It can be used for initializing self-contained
+    // variables whereas Start is better for linking with other objects (as they may not yet
+    // be initialized when Awake is called from this object).
+    // For now we use it to enforce our singleton pattern.
+    void Awake()
     {
+        // Make sure this is the only instance of WorldController
         if (Instance != null)
         {
             Debug.LogError("WorldController - Another WorldController already exists.");
+            return;
         }
-        
-        Instance = this;
 
+        Instance = this;
+    }
+
+    #endregion
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        // Create a new world with empty tiles
         world = new World();
+
+        // Instantiate our tile/GameObject dictionary
+        tileGameObjectMap = new Dictionary<Tile, GameObject>();
 
         // Create a game object for each tile
         for (int x = 0; x < world.Width; x++)
@@ -52,17 +73,43 @@ public class WorldController : MonoBehaviour
                 // Give them each a sprite renderer
                 tile_go.AddComponent<SpriteRenderer>();
 
-                // This fancy little complicated-looking thing is called a lambda.
-                // Basically we are making up a function to link our callback parameters
-                tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); } );
+                // Add the pair to our dictionary
+                tileGameObjectMap.Add(tile_data, tile_go);
+                
+                // Register our callback so that the tile gets updated when its type changes
+                tile_data.RegisterTileTypeChangedCallback( OnTileTypeChanged );
+
             }
         }
         
         world.Generate();
     }
 
-void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
+    // This function returns the tile at a given world coordinate
+    public Tile GetTileAtWorldCoord(Vector3 coord)
     {
+        int x = Mathf.RoundToInt(coord.x);
+        int y = Mathf.RoundToInt(coord.y);
+
+        return WorldController.Instance.World.GetTileAt(x, y);
+    }
+
+    // This function will be automatically called whenever a tile's type gets changed
+    void OnTileTypeChanged(Tile tile_data)
+    {
+        if( ! tileGameObjectMap.ContainsKey(tile_data) )
+        {
+            Debug.LogError("OnTileTypeChanged -  tileGameObjectMap does not contain tile_data");
+            return;
+        }
+
+        GameObject tile_go = tileGameObjectMap[tile_data];
+
+        if( tile_go == null )
+        {
+            Debug.LogError("OnTileTypeChanged - tileGameObjectMap's returned GameObject is null");
+        }
+
         switch (tile_data.Type)
         {
             case Tile.TileType.Floor:
