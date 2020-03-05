@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class WorldController : MonoBehaviour
 {
-    // "Instance" is a property used to ensure there is only one WC
-    public static WorldController Instance { get; protected set; }
     private World world;
     public World World 
     { 
@@ -27,6 +25,9 @@ public class WorldController : MonoBehaviour
     public Sprite dirtSprite;
 
     #region Singleton
+
+    // "Instance" is a property used to ensure there is only one WC
+    public static WorldController Instance { get; protected set; }
 
     // Awake is called even before Start(). It can be used for initializing self-contained
     // variables whereas Start is better for linking with other objects (as they may not yet
