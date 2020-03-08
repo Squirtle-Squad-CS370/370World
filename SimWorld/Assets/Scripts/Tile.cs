@@ -69,4 +69,36 @@ public class Tile
     {
         TileTypeChanged -= callback;
     }
+
+    // This function returns true if two tiles are adjacent.
+    // The bool parameter indicates whether to check diagonals
+    // as well as cardinal directions.
+    public bool IsNeighbor(Tile tile, bool allowDiagonals = false)
+    {
+        // If directly above or below:
+        if( this.X == tile.X && (this.Y == tile.Y-1 || this.Y == tile.Y+1) )
+        {
+            return true;
+        }
+        // If to the left or right:
+        if( this.Y == tile.Y && (this.X == tile.X-1 || this.X == tile.X+1) )
+        {
+            return true;
+        }
+        
+        if( allowDiagonals )
+        {
+            if (this.X == tile.X+1 && (this.Y == tile.Y-1 || this.Y == tile.Y+1))
+            {
+                return true;
+            }
+            if (this.X == tile.X-1 && (this.Y == tile.Y-1 || this.Y == tile.Y+1))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
