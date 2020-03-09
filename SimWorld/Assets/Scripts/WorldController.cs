@@ -29,13 +29,13 @@ public class WorldController : MonoBehaviour
     #endregion
 
     private World world;
-    public World World 
-    { 
-        get 
+    public World World
+    {
+        get
         {
             return world;
         }
-        
+
         protected set {}
     }
 
@@ -46,6 +46,10 @@ public class WorldController : MonoBehaviour
     public Sprite grassSprite;
     public Sprite waterSprite;
     public Sprite dirtSprite;
+
+    public GameObject rockPrefab;
+    public GameObject treePrefab;
+    //public GameObject grassPrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -76,13 +80,14 @@ public class WorldController : MonoBehaviour
 
                 // Add the pair to our dictionary
                 tileGameObjectMap.Add(tile_data, tile_go);
-                
+
                 // Register our callback so that the tile gets updated when its type changes
                 tile_data.RegisterTileTypeChangedCallback( OnTileTypeChanged );
 
             }
         }
-        
+
+        world.setPrefabs(rockPrefab, treePrefab);
         world.Generate();
     }
 

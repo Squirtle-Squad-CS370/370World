@@ -1,11 +1,17 @@
 ﻿using System;
 using UnityEngine;
+using UnityEditor;
 using System.Collections;
 
-public class World // maintain monobehaviour inheritance for use of Start()
+public class World : MonoBehaviour// maintain monobehaviour inheritance for use of Start()
 {
     // may consider switching to Tilemap in the future if environment gets detailed enough
     Tile[,] tileGrid;  // 2D array to hold our tiles
+    //[SerializeField]
+    //private Sprite rockSprite;
+    private GameObject rock;
+    private GameObject tree;
+    private float scale = 2.5F;
 
     // The height and width variables are made properties with accessors
     private int width;  // width of the map, measured in tiles
@@ -46,22 +52,12 @@ public class World // maintain monobehaviour inheritance for use of Start()
         
         Debug.Log("World created with " + (width * height) + " tiles.");
     }
-
-
-
-    /*
-     * // This could be used to only create tiles when they come in sight of the player
-     * // for now, we are creating them all at once at the start of the game
-    public Tile GetTileAt(int x, int y)
+    
+    public void setPrefabs(GameObject r, GameObject t) 
     {
-        if (tileGrid[x, y] == null)
-        {
-            tileGrid[x, y] = new Tile(this, x, y);
-        }
-        
-        return tileGrid[x, y];
+        rock = r;
+        tree = t;
     }
-    */
 
     public Tile GetTileAt(int x, int y)
     {
@@ -81,11 +77,11 @@ public class World // maintain monobehaviour inheritance for use of Start()
         
         UnityEngine.Random.InitState(seed);
         CreateGround(seed);
+        PlaceObjects(seed);
     }
 
-    public void CreateGround(int seed)
+    private void CreateGround(int seed)
     {
-        float scale = 2.5F;
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -94,15 +90,15 @@ public class World // maintain monobehaviour inheritance for use of Start()
                 float ycoord = (((float)y / height) * scale) + seed;
                 float val = Mathf.PerlinNoise(xcoord, ycoord) * 10;
 
-                if (val >= 0 && val <= 2) 
+                if (isDirt(val)) 
                 {
                     tileGrid[x, y].Type = Tile.TileType.Dirt;
                 }
-                else if (val > 2 && val <= 8)
+                else if (isGrass(val))
                 {
                     tileGrid[x, y].Type = Tile.TileType.Grass;
                 }
-                else if (val > 8)
+                else if (isWater(val))
                 {
                     tileGrid[x, y].Type = Tile.TileType.Water;
                 }
@@ -113,5 +109,50 @@ public class World // maintain monobehaviour inheritance for use of Start()
             }
         }
         Debug.Log("Tiles Randomized");
+    }
+    
+    private void PlaceObjects(int seed) 
+    {
+        for (int x = 0; x < width; ++x) 
+        {
+            for (int y = 0; y < height; ++y)
+            {
+                float xcoord = (((float)x / width) * scale) + seed;
+                float ycoord = (((float)y / height) * scale) + seed;
+                float val = Mathf.PerlinNoise(xcoord, ycoord) * 10;
+                
+                if (isDirt(val))
+                {
+                    if (UnityEngine.Random.Range(1, 20) == 4) 
+                    {
+                        Instantiate(rock, new Vector3(x, y, 0), Quaternion.identity);
+                    }
+                } 
+                else if (placeTree(val))
+                {
+                    Instantiate(tree, new Vector3(x, y, 0), Quaternion.identity);
+                }
+            }
+        }
+    }
+    
+    private bool isDirt(float val) 
+    {
+        return (val >= 0 && val <= 2);
+    }
+    
+    private bool isGrass(float val) 
+    {
+        return (val > 2 && val <= 8);
+    }
+    
+    private bool isWater(float val) 
+    {
+        return (val > 8);
+    }
+    
+    private bool placeTree(float val)
+    {
+        return (((val >= 5.7 && val <= 6) || (val >= 4 && val <= 4.2) || (val >= 2.5 && val <= 3)) && (UnityEngine.Random.Range(1, 4) == 2));
     }
 }
