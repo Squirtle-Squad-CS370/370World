@@ -11,6 +11,10 @@ public class WorldController : MonoBehaviour
     public Sprite grassSprite;
     public Sprite waterSprite;
     public Sprite dirtSprite;
+    
+    public GameObject rockPrefab;
+    public GameObject treePrefab;
+    //public GameObject grassPrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -48,6 +52,7 @@ public class WorldController : MonoBehaviour
             }
         }
         
+        world.setPrefabs(rockPrefab, treePrefab);
         world.Generate();
     }
 
