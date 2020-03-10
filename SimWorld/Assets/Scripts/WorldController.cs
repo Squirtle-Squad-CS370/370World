@@ -46,6 +46,7 @@ public class WorldController : MonoBehaviour
     public Sprite grassSprite;
     public Sprite waterSprite;
     public Sprite dirtSprite;
+    public Sprite sandSprite;
 
     public GameObject rockPrefab;
     public GameObject treePrefab;
@@ -55,6 +56,26 @@ public class WorldController : MonoBehaviour
     void Start()
     {
         // Create a new world with empty tiles
+        if (Instance != null)
+        {
+            Debug.LogError("WorldController - Another WorldController already exists.");
+        }
+
+        Instance = this;
+
+        initWorld();
+    }
+
+    void Update()
+    {
+        if (Input.GetKey(KeyCode.R))
+        {
+            Application.LoadLevel(Application.loadedLevel);
+        }
+    }
+
+    void initWorld()
+    {
         world = new World();
 
         // Instantiate our tile/GameObject dictionary
@@ -133,6 +154,9 @@ public class WorldController : MonoBehaviour
             case Tile.TileType.Dirt:
                 tile_go.GetComponent<SpriteRenderer>().sprite = dirtSprite;
                 tile_data.isWalkable = true;
+                break;
+            case Tile.TileType.Sand:
+                tile_go.GetComponent<SpriteRenderer>().sprite = sandSprite;
                 break;
             default:
                 tile_go.GetComponent<SpriteRenderer>().sprite = null;

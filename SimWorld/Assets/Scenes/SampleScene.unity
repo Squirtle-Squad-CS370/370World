@@ -254,11 +254,11 @@ MonoBehaviour:
   grassSprite: {fileID: 21300000, guid: 78510a2b2aba6461b8457d68616b45d0, type: 3}
   waterSprite: {fileID: 21300000, guid: 7175c220caf984978beb8e78f0fd03d6, type: 3}
   dirtSprite: {fileID: 21300000, guid: 640383645846e46e897c6253d37e8176, type: 3}
+  sandSprite: {fileID: 21300000, guid: 219e9fce60ac84d319eb9c07737b726f, type: 3}
   rockPrefab: {fileID: 5628193862471712222, guid: b8be70604a5ab492fb3f2d412e3cbf09,
     type: 3}
   treePrefab: {fileID: 6579137251214423743, guid: 440ae93fd17464f6293bda6f3ac52584,
     type: 3}
-  grassPrefab: {fileID: 0}
 --- !u!4 &771407876
 Transform:
   m_ObjectHideFlags: 0

@@ -8,8 +8,9 @@ public class Tile
     World world;
     int x;
     int y;
+    private float z;
 
-    public enum TileType {Empty, Floor, Grass, Water, Dirt};
+    public enum TileType {Empty, Floor, Grass, Water, Dirt, Sand};
     private TileType type = TileType.Empty;
     public bool isWalkable = true;
 
@@ -28,7 +29,7 @@ public class Tile
             type = value;
             // Since tileType has changed, update its sprite & other things
             // Use the "callback" function to tell stuff we changed
-            if (TileTypeChanged != null) 
+            if (TileTypeChanged != null)
             {
                 TileTypeChanged(this);
             }
@@ -65,6 +66,7 @@ public class Tile
         TileTypeChanged += callback;
         // the use of += means we can call a whole list of functions! very cool
     }
+
     // Unused currently but just in case ¯\_(ツ)_/¯
     public void UnregisterTiletypeChangedCallback(Action<Tile> callback)
     {
@@ -86,7 +88,7 @@ public class Tile
         {
             return true;
         }
-        
+
         if( allowDiagonals )
         {
             if (this.X == tile.X+1 && (this.Y == tile.Y-1 || this.Y == tile.Y+1))
@@ -119,5 +121,15 @@ public class Tile
         }
         // If none of them are walkable
         return false;
+    }
+
+    public float getZ()
+    {
+        return z;
+    }
+
+    public void setZ(float n)
+    {
+        z = n;
     }
 }
