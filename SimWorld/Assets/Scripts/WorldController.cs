@@ -5,25 +5,6 @@ using UnityEngine;
 
 public class WorldController : MonoBehaviour
 {
-    private World world;
-    public World World 
-    { 
-        get 
-        {
-            return world;
-        }
-        
-        protected set {}
-    }
-
-    // This will keep track of tile data and GameObject pairs
-    Dictionary<Tile, GameObject> tileGameObjectMap;
-
-    public Sprite floorSprite;
-    public Sprite grassSprite;
-    public Sprite waterSprite;
-    public Sprite dirtSprite;
-
     #region Singleton
 
     // "Instance" is a property used to ensure there is only one WC
@@ -46,6 +27,25 @@ public class WorldController : MonoBehaviour
     }
 
     #endregion
+
+    private World world;
+    public World World 
+    { 
+        get 
+        {
+            return world;
+        }
+        
+        protected set {}
+    }
+
+    // This will keep track of tile data and GameObject pairs
+    Dictionary<Tile, GameObject> tileGameObjectMap;
+
+    public Sprite floorSprite;
+    public Sprite grassSprite;
+    public Sprite waterSprite;
+    public Sprite dirtSprite;
 
     // Start is called before the first frame update
     void Start()
@@ -115,18 +115,23 @@ public class WorldController : MonoBehaviour
         {
             case Tile.TileType.Floor:
                 tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
+                tile_data.isWalkable = true;
                 break;
             case Tile.TileType.Grass:
                 tile_go.GetComponent<SpriteRenderer>().sprite = grassSprite;
+                tile_data.isWalkable = true;
                 break;
             case Tile.TileType.Water:
                 tile_go.GetComponent<SpriteRenderer>().sprite = waterSprite;
+                tile_data.isWalkable = false;
                 break;
             case Tile.TileType.Dirt:
                 tile_go.GetComponent<SpriteRenderer>().sprite = dirtSprite;
+                tile_data.isWalkable = true;
                 break;
             default:
                 tile_go.GetComponent<SpriteRenderer>().sprite = null;
+                tile_data.isWalkable = true;
                 break;
         }
     }
