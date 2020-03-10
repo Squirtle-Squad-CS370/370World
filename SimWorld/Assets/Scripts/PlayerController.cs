@@ -2,8 +2,10 @@
 
 public class PlayerController : MonoBehaviour
 {
-    private const float MOVE_SPEED = 5F;
     [SerializeField]
+    private MouseManager mouseManager;
+
+    private const float MOVE_SPEED = 5F;
     private float moveSpeed = MOVE_SPEED;
     [SerializeField]
     private float runSpeed = 8f;
@@ -25,6 +27,7 @@ public class PlayerController : MonoBehaviour
     // We collect player input in this method
     void Update()
     {
+        // Handle shift-to-sprint input
         if (Input.GetKey(KeyCode.LeftShift)) 
         {
             moveSpeed = runSpeed;
@@ -41,6 +44,17 @@ public class PlayerController : MonoBehaviour
         // these will be used for animating our character with a blend tree
         // animator.SetFloat("Horizontal", movement.x);
         // animator.SetFloat("Vertical", movement.y);
+
+        // Toolbar hotkey functionality - may be encapsulated later?
+        // Press 1 to shoot, 2 to build walls
+        if( Input.GetKeyDown(KeyCode.Alpha1) )
+        {
+            mouseManager.SetCrosshairCursor();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            mouseManager.SetTileSelectCursor();
+        }
     }
 
     // FixedUpdate is used because it is unaffected by framerate
@@ -51,4 +65,6 @@ public class PlayerController : MonoBehaviour
         // (input direction vector * moveSpeed * [utility for consistent speed] )
         rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
     }
+
+
 }
