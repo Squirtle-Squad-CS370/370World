@@ -127,12 +127,12 @@ public class Tile
         // If none of them are walkable
         return false;
     }
-
+    
     public float getZ()
     {
         return z;
     }
-
+    
     public void setZ(float n)
     {
         z = n;

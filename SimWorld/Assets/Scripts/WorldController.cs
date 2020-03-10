@@ -44,7 +44,7 @@ public class WorldController : MonoBehaviour
     public Sprite waterSprite;
     public Sprite dirtSprite;
     public Sprite sandSprite;
-
+    
     public GameObject rockPrefab;
     public GameObject treePrefab;
     //public GameObject grassPrefab;
@@ -77,7 +77,7 @@ public class WorldController : MonoBehaviour
         world.setPrefabs(rockPrefab, treePrefab);
         world.Generate();
     }
-
+    
     // This function returns the tile at a given world coordinate
     public Tile GetTileAtWorldCoord(Vector3 coord)
     {

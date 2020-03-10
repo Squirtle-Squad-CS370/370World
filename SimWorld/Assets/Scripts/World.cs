@@ -138,6 +138,10 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 {
                     currentChunk.setType(cx, cy, Tile.TileType.Sand);
                 }
+                else if (isSand(val))
+                {
+                    tileGrid[x, y].Type = Tile.TileType.Sand;
+                }
                 else
                 {
                     currentChunk.setType(cx, cy, Tile.TileType.Floor);
