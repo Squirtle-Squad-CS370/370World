@@ -34,10 +34,10 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     }
 
     // Constructor
-    public World(int width = 100, int height = 100) // default size rn is 100x100
+    public World(int w = 200, int h = 200) // default size rn is 100x100
     {
-        this.width = width;
-        this.height = height;
+        width = w;
+        height = h;
 
         // instantiate 2D array
         tileGrid = new Tile[width, height];
@@ -89,7 +89,9 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
             {
                 float xcoord = (((float)x / width) * scale) + seed;
                 float ycoord = (((float)y / height) * scale) + seed;
-                float val = Mathf.PerlinNoise(xcoord, ycoord) * 10;
+                float val = Mathf.Clamp(Mathf.PerlinNoise(xcoord, ycoord) * 10, 0, 10);
+                //float val = Noise.fbm(xcoord, ycoord) * 10;
+                tileGrid[x, y].setZ(val);
 
                 if (isDirt(val)) 
                 {
@@ -103,9 +105,14 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 {
                     tileGrid[x, y].Type = Tile.TileType.Water;
                 }
+                else if (isSand(val))
+                {
+                    tileGrid[x, y].Type = Tile.TileType.Sand;
+                }
                 else
                 {
                     tileGrid[x, y].Type = Tile.TileType.Floor;
+                    Debug.Log("val: " + val);
                 }
             }
         }
@@ -143,17 +150,22 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     
     private bool isDirt(float val) 
     {
-        return (val >= 0 && val <= 2);
+        return (val >= 8);
     }
     
     private bool isGrass(float val) 
     {
-        return (val > 2 && val <= 8);
+        return (val > 2.1 && val < 8);
     }
     
     private bool isWater(float val) 
     {
-        return (val > 8);
+        return (val >= 0 && val <= 2);
+    }
+    
+    private bool isSand(float val)
+    {
+        return (val > 2 && val <= 2.1);
     }
     
     private bool placeTree(float pval, float fval, float r)

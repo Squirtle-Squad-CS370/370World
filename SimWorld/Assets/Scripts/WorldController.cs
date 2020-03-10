@@ -11,6 +11,7 @@ public class WorldController : MonoBehaviour
     public Sprite grassSprite;
     public Sprite waterSprite;
     public Sprite dirtSprite;
+    public Sprite sandSprite;
     
     public GameObject rockPrefab;
     public GameObject treePrefab;
@@ -25,7 +26,20 @@ public class WorldController : MonoBehaviour
         }
         
         Instance = this;
-
+        
+        initWorld();
+    }
+    
+    void Update() 
+    {
+        if (Input.GetKey(KeyCode.R))
+        {
+            Application.LoadLevel(Application.loadedLevel);
+        }
+    }
+    
+    void initWorld() 
+    {
         world = new World();
 
         // Create a game object for each tile
@@ -56,7 +70,7 @@ public class WorldController : MonoBehaviour
         world.Generate();
     }
 
-void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
+    void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
     {
         switch (tile_data.Type)
         {
@@ -71,6 +85,9 @@ void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
                 break;
             case Tile.TileType.Dirt:
                 tile_go.GetComponent<SpriteRenderer>().sprite = dirtSprite;
+                break;
+            case Tile.TileType.Sand:
+                tile_go.GetComponent<SpriteRenderer>().sprite = sandSprite;
                 break;
             default:
                 tile_go.GetComponent<SpriteRenderer>().sprite = null;

@@ -8,8 +8,9 @@ public class Tile
     World world;
     int x;
     int y;
+    private float z;
 
-    public enum TileType {Empty, Floor, Grass, Water, Dirt};
+    public enum TileType {Empty, Floor, Grass, Water, Dirt, Sand};
     private TileType type = TileType.Empty;
 
     // Callback function for when tile changes type to inform other code
@@ -63,5 +64,15 @@ public class Tile
     {
         TileTypeChanged += callback;
         // the use of += means we can call a whole list of functions! very cool
+    }
+    
+    public float getZ()
+    {
+        return z;
+    }
+    
+    public void setZ(float n)
+    {
+        z = n;
     }
 }
