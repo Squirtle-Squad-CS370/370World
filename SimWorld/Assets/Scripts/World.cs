@@ -7,15 +7,15 @@ using static Noise;
 public class World : MonoBehaviour// maintain monobehaviour inheritance for use of Start()
 {
     // may consider switching to Tilemap in the future if environment gets detailed enough
-    Tile[,] tileGrid;  // 2D array to hold our tiles
-    //[SerializeField]
-    //private Sprite rockSprite;
+    Chunk[,] chunks;
+    Chunk currentChunk;
+    
     private GameObject rock;
     private GameObject tree;
     private float scale = 2.5F;
 
     // The height and width variables are made properties with accessors
-    private int width;  // width of the map, measured in tiles
+    private int width;  // width of the map, measured in chunks
     public int Width
     {
         get
@@ -24,7 +24,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         }
     }
     
-    private int height; // height of the map, measured in tiles
+    private int height; // height of the map, measured in chunks
     public int Height
     {
         get
@@ -34,24 +34,38 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     }
 
     // Constructor
-    public World(int w = 200, int h = 200) // default size rn is 100x100
+    public World(int w = 100, int h = 100) // default size rn is 100x100
     {
         width = w;
         height = h;
-
-        // instantiate 2D array
-        tileGrid = new Tile[width, height];
+        
+        chunks = new Chunk[width, height];
+        currentChunk = new Chunk(0, 0);
+        chunks[0, 0] = currentChunk;
 
         // fill with Tile objects
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < currentChunk.w(); x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < currentChunk.h(); y++)
             {
-                tileGrid[x, y] = new Tile(this, x, y);
+                Tile t = new Tile(this, x, y);
+                
+                t.obj.name = "Tile_" + x + "_" + y;
+                t.obj.transform.position = new Vector3(t.X, t.Y, 0);
+                // Clean up our heirarchy by making these tiles children
+                t.obj.transform.SetParent(WorldController.Instance.transform, true);
+
+                // Give them each a sprite renderer
+                t.obj.AddComponent<SpriteRenderer>();
+                
+                SpriteRenderer renderer = t.obj.GetComponent<SpriteRenderer>();
+                renderer.sortingOrder = -1000;
+                
+                currentChunk.addTile(x, y, t);
             }
         }
         
-        Debug.Log("World created with " + (width * height) + " tiles.");
+        Debug.Log("Start chunk created with " + (currentChunk.w() * currentChunk.h()) + " tiles.");
     }
     
     public void setPrefabs(GameObject r, GameObject t) 
@@ -59,17 +73,29 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         rock = r;
         tree = t;
     }
+    
+    public void setTile(int x, int y, Tile tile) 
+    {
+        currentChunk.setTile(x, y, tile);
+    }
+    
+    public Chunk getCurrentChunk()
+    {
+        return currentChunk;
+    }
 
     public Tile GetTileAt(int x, int y)
     {
-        // I'd like to maybe change this to have the map loop around east/west instead
-        if (x < 0 || x > width)
-        {
-            Debug.LogError("Tile (" + x + ", " + y + ") is out of range.");
-            return null;
-        }
+        //Figure out what chunk the tile is in.
+        int chunkX = (x / 100) - 1;
+        int chunkY = (y / 100) - 1;
         
-        return tileGrid[x, y];
+        chunkX = Mathf.Clamp(chunkX, 0, 100);
+        chunkY = Mathf.Clamp(chunkY, 0, 100);
+        
+        Chunk c = chunks[chunkX, chunkY];
+        
+        return c.getTile(x % 100, y % 100);
     }
     
     public void Generate() 
@@ -91,27 +117,30 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 float ycoord = (((float)y / height) * scale) + seed;
                 float val = Mathf.Clamp(Mathf.PerlinNoise(xcoord, ycoord) * 10, 0, 10);
                 //float val = Noise.fbm(xcoord, ycoord) * 10;
-                tileGrid[x, y].setZ(val);
+                int cx = x % 100;
+                int cy = y % 100;
+                
+                currentChunk.setZ(cx, cy, val);
 
                 if (isDirt(val)) 
                 {
-                    tileGrid[x, y].Type = Tile.TileType.Dirt;
+                    currentChunk.setType(cx, cy, Tile.TileType.Dirt);
                 }
                 else if (isGrass(val))
                 {
-                    tileGrid[x, y].Type = Tile.TileType.Grass;
+                    currentChunk.setType(cx, cy, Tile.TileType.Grass);
                 }
                 else if (isWater(val))
                 {
-                    tileGrid[x, y].Type = Tile.TileType.Water;
+                    currentChunk.setType(cx, cy, Tile.TileType.Water);
                 }
                 else if (isSand(val))
                 {
-                    tileGrid[x, y].Type = Tile.TileType.Sand;
+                    currentChunk.setType(cx, cy, Tile.TileType.Sand);
                 }
                 else
                 {
-                    tileGrid[x, y].Type = Tile.TileType.Floor;
+                    currentChunk.setType(cx, cy, Tile.TileType.Floor);
                     Debug.Log("val: " + val);
                 }
             }
@@ -122,7 +151,6 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     private void PlaceObjects(int seed) 
     {
         float r = 5.0F;//UnityEngine.Random.Range(0, 10);
-        //Debug.Log(r);
         
         for (int x = 0; x < width; ++x) 
         {
@@ -142,7 +170,9 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 } 
                 else if (placeTree(pval, fval, r))
                 {
-                    Instantiate(tree, new Vector3(x, y, 0), Quaternion.identity);
+                    GameObject t = Instantiate(tree, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
+                    SpriteRenderer renderer = t.GetComponent<SpriteRenderer>();
+                    renderer.sortingOrder = y - 1;
                 }
             }
         }
@@ -155,7 +185,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     
     private bool isGrass(float val) 
     {
-        return (val > 2.1 && val < 8);
+        return (val > 2.25 && val < 8);
     }
     
     private bool isWater(float val) 
@@ -165,7 +195,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     
     private bool isSand(float val)
     {
-        return (val > 2 && val <= 2.1);
+        return (val > 2 && val <= 2.25);
     }
     
     private bool placeTree(float pval, float fval, float r)

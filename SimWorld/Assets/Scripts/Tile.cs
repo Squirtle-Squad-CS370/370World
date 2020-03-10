@@ -8,7 +8,9 @@ public class Tile
     World world;
     int x;
     int y;
-    private float z;
+    private float z = 0.0F;
+    //TODO: fix public
+    public GameObject obj;
 
     public enum TileType {Empty, Floor, Grass, Water, Dirt, Sand};
     private TileType type = TileType.Empty;
@@ -35,6 +37,7 @@ public class Tile
             }
         }
     }
+    
     public int X
     {
         get
@@ -57,6 +60,7 @@ public class Tile
         world = w;
         this.x = x;
         this.y = y;
+        obj = new GameObject();
     }
 
     // this function will be called with a function as its parameter
@@ -79,23 +83,23 @@ public class Tile
     public bool IsNeighbor(Tile tile, bool allowDiagonals = false)
     {
         // If directly above or below:
-        if( this.X == tile.X && (this.Y == tile.Y-1 || this.Y == tile.Y+1) )
+        if (this.X == tile.X && (this.Y == tile.Y - 1 || this.Y == tile.Y + 1))
         {
             return true;
         }
         // If to the left or right:
-        if( this.Y == tile.Y && (this.X == tile.X-1 || this.X == tile.X+1) )
+        if (this.Y == tile.Y && (this.X == tile.X - 1 || this.X == tile.X + 1))
         {
             return true;
         }
 
-        if( allowDiagonals )
+        if (allowDiagonals)
         {
-            if (this.X == tile.X+1 && (this.Y == tile.Y-1 || this.Y == tile.Y+1))
+            if (this.X == tile.X + 1 && (this.Y == tile.Y - 1 || this.Y == tile.Y + 1))
             {
                 return true;
             }
-            if (this.X == tile.X-1 && (this.Y == tile.Y-1 || this.Y == tile.Y+1))
+            if (this.X == tile.X - 1 && (this.Y == tile.Y - 1 || this.Y == tile.Y + 1))
             {
                 return true;
             }
@@ -108,17 +112,18 @@ public class Tile
     public bool HasWalkableNeighbor()
     {
         // For each surrounding tile
-        for( int tileX = (this.X-1); tileX <= (this.X+1); tileX++ )
+        for (int tileX = (this.X - 1); tileX <= (this.X + 1); tileX++)
         {
-            for( int tileY = (this.Y-1); tileY <= (this.Y+1); tileY++ )
+            for (int tileY = (this.Y - 1); tileY <= (this.Y + 1); tileY++)
             {
                 // If we are not checking ourself and find a walkable tile
-                if( world.GetTileAt(tileX, tileY) != this && world.GetTileAt(tileX, tileY).isWalkable )
+                if (world.GetTileAt(tileX, tileY) != this && world.GetTileAt(tileX, tileY).isWalkable )
                 {
                     return true;
                 }
             }
         }
+        
         // If none of them are walkable
         return false;
     }

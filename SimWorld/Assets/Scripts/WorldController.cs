@@ -39,9 +39,6 @@ public class WorldController : MonoBehaviour
         protected set {}
     }
 
-    // This will keep track of tile data and GameObject pairs
-    Dictionary<Tile, GameObject> tileGameObjectMap;
-
     public Sprite floorSprite;
     public Sprite grassSprite;
     public Sprite waterSprite;
@@ -77,37 +74,6 @@ public class WorldController : MonoBehaviour
     void initWorld()
     {
         world = new World();
-
-        // Instantiate our tile/GameObject dictionary
-        tileGameObjectMap = new Dictionary<Tile, GameObject>();
-
-        // Create a game object for each tile
-        for (int x = 0; x < world.Width; x++)
-        {
-            for (int y = 0; y < world.Height; y++)
-            {
-                Tile tile_data = world.GetTileAt(x, y);
-
-                // create game object, name it according to position,
-                // then move the object to correct position
-                GameObject tile_go = new GameObject();
-                tile_go.name = "Tile_" + x + "_" + y;
-                tile_go.transform.position = new Vector3( tile_data.X, tile_data.Y, 0 );
-                // Clean up our heirarchy by making these tiles children
-                tile_go.transform.SetParent(this.transform, true);
-
-                // Give them each a sprite renderer
-                tile_go.AddComponent<SpriteRenderer>();
-
-                // Add the pair to our dictionary
-                tileGameObjectMap.Add(tile_data, tile_go);
-
-                // Register our callback so that the tile gets updated when its type changes
-                tile_data.RegisterTileTypeChangedCallback( OnTileTypeChanged );
-
-            }
-        }
-
         world.setPrefabs(rockPrefab, treePrefab);
         world.Generate();
     }
@@ -119,49 +85,5 @@ public class WorldController : MonoBehaviour
         int y = Mathf.RoundToInt(coord.y);
 
         return WorldController.Instance.World.GetTileAt(x, y);
-    }
-
-    // This function will be automatically called whenever a tile's type gets changed
-    void OnTileTypeChanged(Tile tile_data)
-    {
-        if( ! tileGameObjectMap.ContainsKey(tile_data) )
-        {
-            Debug.LogError("OnTileTypeChanged -  tileGameObjectMap does not contain tile_data");
-            return;
-        }
-
-        GameObject tile_go = tileGameObjectMap[tile_data];
-
-        if( tile_go == null )
-        {
-            Debug.LogError("OnTileTypeChanged - tileGameObjectMap's returned GameObject is null");
-        }
-
-        switch (tile_data.Type)
-        {
-            case Tile.TileType.Floor:
-                tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
-                tile_data.isWalkable = true;
-                break;
-            case Tile.TileType.Grass:
-                tile_go.GetComponent<SpriteRenderer>().sprite = grassSprite;
-                tile_data.isWalkable = true;
-                break;
-            case Tile.TileType.Water:
-                tile_go.GetComponent<SpriteRenderer>().sprite = waterSprite;
-                tile_data.isWalkable = false;
-                break;
-            case Tile.TileType.Dirt:
-                tile_go.GetComponent<SpriteRenderer>().sprite = dirtSprite;
-                tile_data.isWalkable = true;
-                break;
-            case Tile.TileType.Sand:
-                tile_go.GetComponent<SpriteRenderer>().sprite = sandSprite;
-                break;
-            default:
-                tile_go.GetComponent<SpriteRenderer>().sprite = null;
-                tile_data.isWalkable = true;
-                break;
-        }
     }
 }
