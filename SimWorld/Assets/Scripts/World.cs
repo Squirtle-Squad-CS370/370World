@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using static Noise;
 
 public class World : MonoBehaviour// maintain monobehaviour inheritance for use of Start()
 {
@@ -113,22 +114,26 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     
     private void PlaceObjects(int seed) 
     {
+        float r = 5.0F;//UnityEngine.Random.Range(0, 10);
+        //Debug.Log(r);
+        
         for (int x = 0; x < width; ++x) 
         {
             for (int y = 0; y < height; ++y)
             {
                 float xcoord = (((float)x / width) * scale) + seed;
                 float ycoord = (((float)y / height) * scale) + seed;
-                float val = Mathf.PerlinNoise(xcoord, ycoord) * 10;
+                float pval = Mathf.PerlinNoise(xcoord, ycoord) * 10;
+                float fval = Noise.fbm(xcoord, ycoord) * 10;
                 
-                if (isDirt(val))
+                if (isDirt(pval))
                 {
                     if (UnityEngine.Random.Range(1, 20) == 4) 
                     {
                         Instantiate(rock, new Vector3(x, y, 0), Quaternion.identity);
                     }
                 } 
-                else if (placeTree(val))
+                else if (placeTree(pval, fval, r))
                 {
                     Instantiate(tree, new Vector3(x, y, 0), Quaternion.identity);
                 }
@@ -151,8 +156,9 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         return (val > 8);
     }
     
-    private bool placeTree(float val)
+    private bool placeTree(float pval, float fval, float r)
     {
-        return (((val >= 5.7 && val <= 6) || (val >= 4 && val <= 4.2) || (val >= 2.5 && val <= 3)) && (UnityEngine.Random.Range(1, 4) == 2));
+        //return (((pval >= 5.7 && pval <= 6) || (pval >= 4 && pval <= 4.2) || (pval >= 2.5 && pval <= 3)) && (UnityEngine.Random.Range(1, 4) == 2));
+        return ((fval >= r && fval <= (r + 0.5)) && isGrass(pval) && (UnityEngine.Random.Range(1, 4) == 2));
     }
 }
