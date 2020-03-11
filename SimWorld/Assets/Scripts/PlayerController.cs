@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
     // [SerializeField]
     // private Animator animator;
 
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         this.rb = transform.GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -47,7 +49,7 @@ public class PlayerController : MonoBehaviour
 
         // Toolbar hotkey functionality - may be encapsulated later?
         // Press 1 to shoot, 2 to build walls
-        if( Input.GetKeyDown(KeyCode.Alpha1) )
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             mouseManager.SetCrosshairCursor();
         }
@@ -55,6 +57,8 @@ public class PlayerController : MonoBehaviour
         {
             mouseManager.SetTileSelectCursor();
         }
+        
+        spriteRenderer.sortingOrder = (int)rb.position.y;
     }
 
     // FixedUpdate is used because it is unaffected by framerate
