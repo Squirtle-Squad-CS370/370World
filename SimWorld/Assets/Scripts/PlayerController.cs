@@ -5,18 +5,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private MouseManager mouseManager;
 
-    private const float MOVE_SPEED = 5F;
-    private float moveSpeed = MOVE_SPEED;
+    [Header("Movement Settings")]
     [SerializeField]
-    private float runSpeed = 8f;
+    private const float runSpeed = 8f;
+    [SerializeField]
+    private const float walkSpeed = 5f;
 
+    [Header("SFX Settings")]
+    public AudioClip ac_footstep;
     [SerializeField]
+    private float walkSFXTime;  // time between footstep sfx when walking
+    [SerializeField]
+    private float sprintSFXTime;    // time between footstep sfx when sprinting
+
+    // Internal use only
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
-    // [SerializeField]
     // private Animator animator;
-
     private Vector2 moveInput; // will be used to store player input between Update & Fixed
+    private float currentMoveSpeed;
+    private float footstepSFXTimer = 0f;
 
     // Start is called before the first frame update
     void Start()
@@ -32,11 +40,11 @@ public class PlayerController : MonoBehaviour
         // Handle shift-to-sprint input
         if (Input.GetKey(KeyCode.LeftShift)) 
         {
-            moveSpeed = runSpeed;
+            currentMoveSpeed = runSpeed;
         }
         else
         {
-            moveSpeed = MOVE_SPEED;
+            currentMoveSpeed = walkSpeed;
         }
         
         // by default, getAxisRaw() responds to both arrow keys & WASD
@@ -67,7 +75,37 @@ public class PlayerController : MonoBehaviour
     {
         // move to the location that is the current position plus 
         // (input direction vector * moveSpeed * [utility for consistent speed] )
-        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + moveInput * currentMoveSpeed * Time.fixedDeltaTime);
+
+        // Play sound effects
+        if( moveInput != Vector2.zero )
+        {
+            switch( currentMoveSpeed )
+            {
+                case walkSpeed:
+                    if( footstepSFXTimer <= 0 )
+                    {
+                        AudioController.Instance.PlaySound(ac_footstep, transform.position);
+                        footstepSFXTimer = walkSFXTime;
+                    }
+                    footstepSFXTimer -= Time.deltaTime;
+                    break;
+                case runSpeed:
+                    if( footstepSFXTimer <= 0 )
+                    {
+                        AudioController.Instance.PlaySound(ac_footstep, transform.position);
+                        footstepSFXTimer = sprintSFXTime;
+                    }
+                    footstepSFXTimer -= Time.deltaTime;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            footstepSFXTimer = 0f;
+        }
     }
 
 

@@ -28,7 +28,7 @@ public class TurretAI : MonoBehaviour
     private GameObject bulletPrefab;
 
     [Header("Sound Settings")]
-    public AudioClip ac_targetAcquired;
+    public AudioClip ac_targetLock;
     public AudioClip ac_shoot;
 
     private Transform target;
@@ -100,6 +100,7 @@ public class TurretAI : MonoBehaviour
         if ( collision.tag == "Enemy" )
         {
             lockOnTimer = timeToLockTarget;
+            AudioController.Instance.PlaySound(ac_targetLock, transform.position);
             target = collision.transform;
         }
     }
@@ -118,8 +119,11 @@ public class TurretAI : MonoBehaviour
         // Otherwise we fire projectiles
         else
         {
+            // Create a bullet
             GameObject bullet = Instantiate(bulletPrefab, transform.position, rot);
             bullet.transform.SetParent(transform);
+            // Play sfx
+            AudioController.Instance.PlaySound(ac_shoot, transform.position);
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
             rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
         }      
