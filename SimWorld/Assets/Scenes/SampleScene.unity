@@ -700,21 +700,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1228459731817005954, guid: 88d2564fc9c09e845a42c09f2a1cd9b8,
-        type: 3}
-      propertyPath: ac_shoot
-      value: 
-      objectReference: {fileID: 8300000, guid: 49f7480278edfa3468cc76403d364986, type: 3}
-    - target: {fileID: 1228459731817005954, guid: 88d2564fc9c09e845a42c09f2a1cd9b8,
-        type: 3}
-      propertyPath: ac_targetLock
-      value: 
-      objectReference: {fileID: 8300000, guid: 0b6328b7d19b5a943bb0b3db81651369, type: 3}
-    - target: {fileID: 1228459731817005954, guid: 88d2564fc9c09e845a42c09f2a1cd9b8,
-        type: 3}
-      propertyPath: timeToLockTarget
-      value: 1.5
-      objectReference: {fileID: 0}
     - target: {fileID: 1228459731817008252, guid: 88d2564fc9c09e845a42c09f2a1cd9b8,
         type: 3}
       propertyPath: m_Name
