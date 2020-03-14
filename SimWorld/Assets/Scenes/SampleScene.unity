@@ -718,6 +718,15 @@ PrefabInstance:
       propertyPath: m_BodyType
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1835152126, guid: aaa231c617add014bbe140991550bd5b, type: 3}
+      propertyPath: m_Mass
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79337834187756344, guid: aaa231c617add014bbe140991550bd5b,
+        type: 3}
+      propertyPath: maxHealth
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4449734791992319912, guid: aaa231c617add014bbe140991550bd5b,
         type: 3}
       propertyPath: m_LocalPosition.x
