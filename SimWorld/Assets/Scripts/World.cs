@@ -7,12 +7,13 @@ using static Noise;
 public class World : MonoBehaviour// maintain monobehaviour inheritance for use of Start()
 {
     // may consider switching to Tilemap in the future if environment gets detailed enough
-    Chunk[,] chunks;
+    Chunk[] chunks;
     Chunk currentChunk;
     
     private GameObject rock;
     private GameObject tree;
     private float scale = 2.5F;
+    private int chunkCount = 0;
 
     // The height and width variables are made properties with accessors
     private int width;  // width of the map, measured in chunks
@@ -39,19 +40,30 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         width = w;
         height = h;
         
-        chunks = new Chunk[width, height];
-        currentChunk = new Chunk(0, 0);
-        chunks[0, 0] = currentChunk;
+        chunks = new Chunk[width * height];
+        currentChunk = null;
 
-        // fill with Tile objects
-        for (int x = 0; x < currentChunk.w(); x++)
+        for (int i = 0; i < width * height; ++i)
         {
-            for (int y = 0; y < currentChunk.h(); y++)
+            chunks[i] = null;
+        }
+
+        //first chunk
+        //populateChunk(currentChunk);
+        
+        //Debug.Log("Start chunk created with " + (currentChunk.w() * currentChunk.h()) + " tiles.");
+    }
+
+    private void populateChunk(Chunk chunk)
+    {
+        for (int x = 0; x < chunk.w(); x++)
+        {
+            for (int y = 0; y < chunk.h(); y++)
             {
                 Tile t = new Tile(this, x, y);
                 
-                t.obj.name = "Tile_" + x + "_" + y;
-                t.obj.transform.position = new Vector3(t.X, t.Y, 0);
+                t.obj.name = "cid_" + chunk.id() + "_tile_" + x + "_" + y;
+                t.obj.transform.position = new Vector3(t.X + (chunk.x() * 100), t.Y + (chunk.y() * 100), 0);
                 // Clean up our heirarchy by making these tiles children
                 t.obj.transform.SetParent(WorldController.Instance.transform, true);
 
@@ -61,11 +73,9 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 SpriteRenderer renderer = t.obj.GetComponent<SpriteRenderer>();
                 renderer.sortingOrder = -1000;
                 
-                currentChunk.addTile(x, y, t);
+                chunk.addTile(x, y, t);
             }
         }
-        
-        Debug.Log("Start chunk created with " + (currentChunk.w() * currentChunk.h()) + " tiles.");
     }
     
     public void setPrefabs(GameObject r, GameObject t) 
@@ -92,10 +102,17 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         
         chunkX = Mathf.Clamp(chunkX, 0, 100);
         chunkY = Mathf.Clamp(chunkY, 0, 100);
+
+        for (int i = 0; i < width * height; ++i) 
+        {
+            Chunk c = chunks[i];
+            if ((x >= c.x() && x <= c.x() + c.w()) && (y >= c.y() && y <= c.y() + c.h()))
+            {
+                return c.getTile(x % 100, y % 100);
+            }
+        }
         
-        Chunk c = chunks[chunkX, chunkY];
-        
-        return c.getTile(x % 100, y % 100);
+        return null;
     }
     
     public void Generate() 
@@ -103,44 +120,56 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         int seed = System.DateTime.Now.Millisecond;
         
         UnityEngine.Random.InitState(seed);
-        CreateGround(seed);
-        PlaceObjects(seed);
+
+        //Create 4 stater chunks
+        for (int x = 0; x < 2; ++x) 
+        {
+            for (int y = 0; y < 2; ++y)
+            {
+                Chunk c = new Chunk(x, y, chunkCount);
+                chunks[chunkCount++] = c;
+
+                populateChunk(c);
+                CreateGround(c, seed);
+                PlaceObjects(c, seed);
+            }
+        }
     }
 
-    private void CreateGround(int seed)
+    private void CreateGround(Chunk chunk, int seed)
     {
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                float xcoord = (((float)x / width) * scale) + seed;
-                float ycoord = (((float)y / height) * scale) + seed;
+                float xcoord = (((float)(x + (chunk.x() * 100)) / width) * scale) + seed;
+                float ycoord = (((float)(y + (chunk.y() * 100)) / height) * scale) + seed;
                 float val = Mathf.Clamp(Mathf.PerlinNoise(xcoord, ycoord) * 10, 0, 10);
                 //float val = Noise.fbm(xcoord, ycoord) * 10;
                 int cx = x % 100;
                 int cy = y % 100;
                 
-                currentChunk.setZ(cx, cy, val);
+                chunk.setZ(cx, cy, val);
 
                 if (isDirt(val)) 
                 {
-                    currentChunk.setType(cx, cy, Tile.TileType.Dirt);
+                    chunk.setType(cx, cy, Tile.TileType.Dirt);
                 }
                 else if (isGrass(val))
                 {
-                    currentChunk.setType(cx, cy, Tile.TileType.Grass);
+                    chunk.setType(cx, cy, Tile.TileType.Grass);
                 }
                 else if (isWater(val))
                 {
-                    currentChunk.setType(cx, cy, Tile.TileType.Water);
+                    chunk.setType(cx, cy, Tile.TileType.Water);
                 }
                 else if (isSand(val))
                 {
-                    currentChunk.setType(cx, cy, Tile.TileType.Sand);
+                    chunk.setType(cx, cy, Tile.TileType.Sand);
                 }
                 else
                 {
-                    currentChunk.setType(cx, cy, Tile.TileType.Floor);
+                    chunk.setType(cx, cy, Tile.TileType.Floor);
                     Debug.Log("val: " + val);
                 }
             }
@@ -148,13 +177,15 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         Debug.Log("Tiles Randomized");
     }
     
-    private void PlaceObjects(int seed) 
+    private void PlaceObjects(Chunk chunk, int seed) 
     {
         float r = 5.0F;//UnityEngine.Random.Range(0, 10);
+        int adjustedX = chunk.x() * 100;
+        int adjustedY = chunk.y() * 100;
         
-        for (int x = 0; x < width; ++x) 
+        for (int x = adjustedX; x < adjustedX + width; ++x) 
         {
-            for (int y = 0; y < height; ++y)
+            for (int y = adjustedY; y < adjustedY + height; ++y)
             {
                 float xcoord = (((float)x / width) * scale) + seed;
                 float ycoord = (((float)y / height) * scale) + seed;

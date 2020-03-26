@@ -5,14 +5,16 @@ public class Chunk
     private const int width = 100;
     private const int height = 100;
     private Tile[,] tileData;
-    private int x;
-    private int y;
+    private int _x;
+    private int _y;
     private bool isActive;
+    private int _id;
     
-    public Chunk(int sx, int sy)
+    public Chunk(int x, int y, int id)
     {
-        x = sx;
-        y = sy;
+        _x = x;
+        _y = y;
+        _id = id;
         tileData = new Tile[width, height];
     }
     
@@ -72,6 +74,16 @@ public class Chunk
     {
         tileData[x, y].setZ(z);
     }
+
+    public int x()
+    {
+        return _x;
+    }
+
+    public int y()
+    {
+        return _y;
+    }
     
     public int w()
     {
@@ -81,5 +93,10 @@ public class Chunk
     public int h()
     {
         return height;
+    }
+
+    public int id()
+    {
+        return _id;
     }
 }
