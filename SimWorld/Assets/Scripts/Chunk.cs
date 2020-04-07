@@ -5,6 +5,8 @@ public class Chunk
     private const int width = 100;
     private const int height = 100;
     private Tile[,] tileData;
+    private GameObject[] objectData;
+    private int objectCount;
     private int _x;
     private int _y;
     private bool isActive;
@@ -16,6 +18,8 @@ public class Chunk
         _y = y;
         _id = id;
         tileData = new Tile[width, height];
+        objectData = new GameObject[1000]; //TODO: is there a better way to do this?
+        objectCount = 0;
     }
     
     //Must be normalized to the chunk
@@ -73,6 +77,14 @@ public class Chunk
     public void setZ(int x, int y, float z) 
     {
         tileData[x, y].setZ(z);
+    }
+
+    public void addObject(GameObject obj)
+    {
+        if (objectCount < 1000)
+        {
+            objectData[objectCount++] = obj;
+        }
     }
 
     public int x()

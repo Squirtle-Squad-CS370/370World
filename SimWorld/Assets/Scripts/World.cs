@@ -196,7 +196,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 {
                     if (UnityEngine.Random.Range(1, 20) == 4) 
                     {
-                        Instantiate(rock, new Vector3(x, y, 0), Quaternion.identity);
+                        chunk.addObject(Instantiate(rock, new Vector3(x, y, 0), Quaternion.identity));
                     }
                 } 
                 else if (placeTree(pval, fval, r))
@@ -204,6 +204,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                     GameObject t = Instantiate(tree, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
                     SpriteRenderer renderer = t.GetComponent<SpriteRenderer>();
                     renderer.sortingOrder = y - 1;
+                    chunk.addObject(t);
                 }
             }
         }
@@ -229,6 +230,9 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         return (val > 2 && val <= 2.25);
     }
     
+    //pval - perlin noise
+    //fval - fractal brownian motion
+    //r - range
     private bool placeTree(float pval, float fval, float r)
     {
         //return (((pval >= 5.7 && pval <= 6) || (pval >= 4 && pval <= 4.2) || (pval >= 2.5 && pval <= 3)) && (UnityEngine.Random.Range(1, 4) == 2));
