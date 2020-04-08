@@ -79,7 +79,7 @@ public class TurretAI : MonoBehaviour
         }
 
         // If target goes out of range
-        if( hasTargetLocked && Vector3.Distance( transform.position, target.position ) > attackRange )
+        if( hasTargetLocked && target != null && Vector3.Distance( transform.position, target.position ) > attackRange )
         {
             hasTargetLocked = false;
             Debug.Log(gameObject.name + " is safe... for now.");
@@ -107,6 +107,11 @@ public class TurretAI : MonoBehaviour
 
     private void Shoot()
     {
+        if( target == null )
+        {
+            return;
+        }
+
         Vector3 dir = (target.position - transform.position).normalized;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
         Quaternion rot = Quaternion.Euler(0, 0, angle);
