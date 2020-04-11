@@ -74,8 +74,14 @@ public class WorldController : MonoBehaviour
     void initWorld()
     {
         world = new World();
+        //world = AddComponent<World>() as World;
         world.setPrefabs(rockPrefab, treePrefab);
         world.Generate();
+    }
+
+    public void saveWorld()
+    {
+        world.save();
     }
     
     // This function returns the tile at a given world coordinate

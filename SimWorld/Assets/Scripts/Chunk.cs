@@ -1,11 +1,12 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Chunk
 {
     private const int width = 100;
     private const int height = 100;
     private Tile[,] tileData;
-    private GameObject[] objectData;
+    private List<GameObject> objectData;
     private int objectCount;
     private int _x;
     private int _y;
@@ -18,7 +19,7 @@ public class Chunk
         _y = y;
         _id = id;
         tileData = new Tile[width, height];
-        objectData = new GameObject[1000]; //TODO: is there a better way to do this?
+        objectData = new List<GameObject>();
         objectCount = 0;
     }
     
@@ -83,7 +84,8 @@ public class Chunk
     {
         if (objectCount < 1000)
         {
-            objectData[objectCount++] = obj;
+            objectData.Add(obj);
+            ++objectCount;
         }
     }
 

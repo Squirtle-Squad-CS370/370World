@@ -2,8 +2,12 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+using System.IO;
 using static Noise;
 
+//[System.Serializable]
 public class World : MonoBehaviour// maintain monobehaviour inheritance for use of Start()
 {
     // may consider switching to Tilemap in the future if environment gets detailed enough
@@ -14,6 +18,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     private GameObject tree;
     private float scale = 2.5F;
     private int chunkCount = 0;
+    private int seed = 0;
 
     // The height and width variables are made properties with accessors
     private int width;  // width of the map, measured in chunks
@@ -60,7 +65,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         {
             for (int y = 0; y < chunk.h(); y++)
             {
-                Tile t = new Tile(this, x, y);
+                Tile t = new Tile(x, y);
                 
                 t.obj.name = "cid_" + chunk.id() + "_tile_" + x + "_" + y;
                 t.obj.transform.position = new Vector3(t.X + (chunk.x() * 100), t.Y + (chunk.y() * 100), 0);
@@ -117,7 +122,17 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     
     public void Generate() 
     {
-        int seed = System.DateTime.Now.Millisecond;
+        string path = Application.persistentDataPath + "/world.370";
+        
+        if (File.Exists(path)) 
+        {
+            TextReader reader = File.OpenText(path);
+            seed = int.Parse(reader.ReadLine());
+        } 
+        else 
+        {
+            seed = System.DateTime.Now.Millisecond;
+        }
         
         UnityEngine.Random.InitState(seed);
 
@@ -134,6 +149,45 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 PlaceObjects(c, seed);
             }
         }
+
+        save();
+    }
+
+    public void save()
+    {
+        string path = Application.persistentDataPath + "/world.370";
+        Debug.Log(path);
+        
+        StreamWriter sw = new StreamWriter(path);
+        sw.WriteLine(string.Format("{0}", seed));
+        sw.Close();
+        
+        /*
+        DataContractSerializer ds = new DataContractSerializer(chunks[0].GetType());
+        MemoryStream ms = new MemoryStream();
+        
+        for (int i = 0; i < chunkCount; ++i)
+        {
+            ds.WriteObject(ms, chunks[i]);
+        }
+        
+        ms.Seek(0, SeekOrigin.Begin);
+        
+        FileStream file = File.Create(Application.persistentDataPath + "/world.370");
+        file.Write(ms.GetBuffer(), 0, ms.GetBuffer().Length);
+        file.Close();
+        */
+        /*
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/world.370");
+
+        for (int i = 0; i < chunkCount; ++i) 
+        {
+            bf.Serialize(file, chunks[i]);
+        }
+
+        file.Close();
+        */
     }
 
     private void CreateGround(Chunk chunk, int seed)
@@ -174,7 +228,8 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 }
             }
         }
-        Debug.Log("Tiles Randomized");
+        
+        //Debug.Log("Tiles Randomized");
     }
     
     private void PlaceObjects(Chunk chunk, int seed) 
@@ -237,5 +292,21 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     {
         //return (((pval >= 5.7 && pval <= 6) || (pval >= 4 && pval <= 4.2) || (pval >= 2.5 && pval <= 3)) && (UnityEngine.Random.Range(1, 4) == 2));
         return ((fval >= r && fval <= (r + 0.5)) && isGrass(pval) && (UnityEngine.Random.Range(1, 4) == 2));
+    }
+
+    public bool TileHasWalkableNeighbor(Tile tile)
+    {
+        // For each surrounding tile
+        for (int tileX = (tile.X - 1); tileX <= (tile.X + 1); tileX++)
+        {
+            for (int tileY = (tile.Y - 1); tileY <= (tile.Y + 1); tileY++)
+            {
+                // If we are not checking ourself and find a walkable tile
+                return (GetTileAt(tileX, tileY) != tile && GetTileAt(tileX, tileY).isWalkable);
+            }
+        }
+        
+        // If none of them are walkable
+        return false;
     }
 }
