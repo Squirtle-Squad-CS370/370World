@@ -28,7 +28,7 @@ public class TurretAI : MonoBehaviour
     private GameObject bulletPrefab;
 
     [Header("Sound Settings")]
-    public AudioClip ac_targetAcquired;
+    public AudioClip ac_targetLock;
     public AudioClip ac_shoot;
 
     private Transform target;
@@ -79,7 +79,7 @@ public class TurretAI : MonoBehaviour
         }
 
         // If target goes out of range
-        if( hasTargetLocked && Vector3.Distance( transform.position, target.position ) > attackRange )
+        if( hasTargetLocked && target != null && Vector3.Distance( transform.position, target.position ) > attackRange )
         {
             hasTargetLocked = false;
             Debug.Log(gameObject.name + " is safe... for now.");
@@ -100,12 +100,18 @@ public class TurretAI : MonoBehaviour
         if ( collision.tag == "Enemy" )
         {
             lockOnTimer = timeToLockTarget;
+            AudioController.Instance.PlaySound(ac_targetLock, transform.position);
             target = collision.transform;
         }
     }
 
     private void Shoot()
     {
+        if( target == null )
+        {
+            return;
+        }
+
         Vector3 dir = (target.position - transform.position).normalized;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
         Quaternion rot = Quaternion.Euler(0, 0, angle);
@@ -118,8 +124,11 @@ public class TurretAI : MonoBehaviour
         // Otherwise we fire projectiles
         else
         {
+            // Create a bullet
             GameObject bullet = Instantiate(bulletPrefab, transform.position, rot);
             bullet.transform.SetParent(transform);
+            // Play sfx
+            AudioController.Instance.PlaySound(ac_shoot, transform.position);
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
             rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
         }      

@@ -96,14 +96,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 5
-  timeToLockTarget: 3
+  timeToLockTarget: 1.5
   timeBetweenAttacks: 1.2
   bulletSpeed: 6
   bulletSprite: {fileID: 0}
   bulletPrefab: {fileID: 5801895077872095944, guid: 802aa1ce005a26843a33361cd817403d,
     type: 3}
-  ac_targetAcquired: {fileID: 0}
-  ac_shoot: {fileID: 0}
+  ac_targetLock: {fileID: 8300000, guid: 0b6328b7d19b5a943bb0b3db81651369, type: 3}
+  ac_shoot: {fileID: 8300000, guid: 49f7480278edfa3468cc76403d364986, type: 3}
 --- !u!58 &1228459731817008253
 CircleCollider2D:
   m_ObjectHideFlags: 0
