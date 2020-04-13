@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Tile
 {
-    World world;
     int x;
     int y;
     private float z = 0.0F;
@@ -55,9 +55,8 @@ public class Tile
 
 
     // Constructor
-    public Tile(World w, int x, int y)
+    public Tile(int x, int y)
     {
-        world = w;
         this.x = x;
         this.y = y;
         obj = new GameObject();
@@ -105,26 +104,6 @@ public class Tile
             }
         }
 
-        return false;
-    }
-
-    // This function returns true if any of the surrounding tiles are walkable.
-    public bool HasWalkableNeighbor()
-    {
-        // For each surrounding tile
-        for (int tileX = (this.X - 1); tileX <= (this.X + 1); tileX++)
-        {
-            for (int tileY = (this.Y - 1); tileY <= (this.Y + 1); tileY++)
-            {
-                // If we are not checking ourself and find a walkable tile
-                if (world.GetTileAt(tileX, tileY) != this && world.GetTileAt(tileX, tileY).isWalkable )
-                {
-                    return true;
-                }
-            }
-        }
-        
-        // If none of them are walkable
         return false;
     }
     

@@ -90,7 +90,7 @@ public class AnimalAI : MonoBehaviour
         float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
 
         // If we are close, no need to check tiles beyond it
-        if( distanceToTarget < moveSpeed )
+        if (distanceToTarget < moveSpeed)
         {
             pathCheckDistance = distanceToTarget;
         }
@@ -103,13 +103,13 @@ public class AnimalAI : MonoBehaviour
         // Set up our vector before the loop
         Vector3 positionToCheck = transform.position;
         // For every spot ahead of us within path check distance, at 1 unit increments
-        for( int i = 1; i <= pathCheckDistance; i++ )
+        for (int i = 1; i <= pathCheckDistance; i++)
         {
             positionToCheck += transform.forward;
             Tile tileToCheck = WorldController.Instance.GetTileAtWorldCoord(positionToCheck);
 
             // If the tile there is not walkable, change course
-            if( ! tileToCheck.isWalkable )
+            if (!tileToCheck.isWalkable)
             {
                 // FIXME: For now, all our Animal does to course correct
                 // is pick a new random position to move to. Will need work
