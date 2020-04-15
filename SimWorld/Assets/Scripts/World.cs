@@ -17,6 +17,8 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     
     private GameObject rock;
     private GameObject tree;
+    private GameObject bush;
+    private GameObject grass;
     private float scale = 2.5F;
     private int chunkCount = 0;
     private int seed = 0;
@@ -48,6 +50,11 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         
         chunks = new List<Chunk>();
         currentChunk = null;
+        
+        rock = WorldController.Instance.rockPrefab;
+        tree = WorldController.Instance.treePrefab;
+        bush = WorldController.Instance.bushPrefab;
+        grass = WorldController.Instance.grassPrefab;
     }
 
     private void populateChunk(Chunk chunk)
@@ -72,12 +79,6 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 chunk.addTile(x, y, t);
             }
         }
-    }
-    
-    public void setPrefabs(GameObject r, GameObject t) 
-    {
-        rock = r;
-        tree = t;
     }
     
     public void setTile(int x, int y, Tile tile) 
@@ -115,7 +116,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     {
         string path = Application.persistentDataPath + "/world.370";
         
-        if (File.Exists(path)) 
+        if (false && File.Exists(path)) 
         {
             load();
             return;
@@ -181,6 +182,8 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     
     private void load()
     {
+        //TODO(Skyler): Only load the needed chunks.
+        
         string path = Application.persistentDataPath + "/world.370";
         
         if (File.Exists(path)) 
@@ -300,8 +303,16 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 {
                     GameObject t = Instantiate(tree, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
                     SpriteRenderer renderer = t.GetComponent<SpriteRenderer>();
-                    renderer.sortingOrder = y - 1;
+                    renderer.sortingOrder = y + 1;
                     chunk.addObject(t);
+                }
+                else if (placeBush(pval, fval, r))
+                {
+                    chunk.addObject(Instantiate(bush, new Vector3(x, y, 0), Quaternion.identity));
+                }
+                else if (placeGrass(pval, fval, r))
+                {
+                    chunk.addObject(Instantiate(grass, new Vector3(x, y, 0), Quaternion.identity));
                 }
             }
         }
@@ -359,6 +370,16 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     {
         //return (((pval >= 5.7 && pval <= 6) || (pval >= 4 && pval <= 4.2) || (pval >= 2.5 && pval <= 3)) && (UnityEngine.Random.Range(1, 4) == 2));
         return ((fval >= r && fval <= (r + 0.5)) && isGrass(pval) && (UnityEngine.Random.Range(1, 4) == 2));
+    }
+    
+    private bool placeBush(float pval, float fval, float r)
+    {
+        return ((pval >= r && pval <= (r + 0.5)) && isGrass(pval) && (UnityEngine.Random.Range(1, 14) == 3));
+    }
+    
+    private bool placeGrass(float pval, float fval, float r)
+    {
+        return (!placeTree(pval, fval, r) && !placeBush(pval, fval, r) && isGrass(pval) && (UnityEngine.Random.Range(1, 15) == 12));
     }
 
     public bool TileHasWalkableNeighbor(Tile tile)
