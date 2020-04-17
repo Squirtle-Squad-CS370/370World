@@ -21,6 +21,14 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        if( Input.GetKeyDown(KeyCode.Alpha1) )
+        {
+            DropItem(0);
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // If we collide with an item, pick it up
@@ -115,11 +123,18 @@ public class Inventory : MonoBehaviour
 
         slots[ID].item = null;
         slots[ID].itemImage.sprite = null;
+        slots[ID].UpdateQuantity();
         slots[ID].isEmpty = true;
         slots[ID].itemImage.enabled = false;
     }
     // Remove item and drop it on the ground
-    private void DropItem(int ID)
+    // If no direction is specified, will throw it randomly
+    public void DropItem(int ID)
+    {
+        Vector3 dir = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized;
+        DropItem(ID, dir);
+    }
+    public void DropItem(int ID, Vector3 dir)
     {
         if( slots[ID].isEmpty )
         {
@@ -127,13 +142,10 @@ public class Inventory : MonoBehaviour
             return;
         }
 
-        float rndX = UnityEngine.Random.Range(-1f, 1f);
-        float rndY = UnityEngine.Random.Range(-1f, 1f);
-        Vector3 rndDir = new Vector3(rndX, rndY, 0f);
-
         slots[ID].item.transform.position = transform.position;
         slots[ID].item.go.SetActive(true);
-        slots[ID].item.rb.AddForce(rndDir * 5f);
+        slots[ID].item.rb.AddForce(dir * 100f, ForceMode2D.Impulse);
+        slots[ID].item.OnDrop();
 
         RemoveItem(ID);
     }

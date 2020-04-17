@@ -19,6 +19,12 @@ public class InventorySlot : MonoBehaviour
     
     public void UpdateQuantity()
     {
+        if( item == null )
+        {
+            quantityTxt.enabled = false;
+            return;
+        }
+
         quantityTxt.text = "x" + item.quantity;
 
         if( item.quantity == 1 )
