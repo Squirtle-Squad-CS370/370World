@@ -9,9 +9,10 @@ public class InventorySlot : MonoBehaviour, IPointerDownHandler, IBeginDragHandl
     private Canvas canvas;
 
     public bool isEmpty;
-    public Image itemImage;
+    public int index;
+    private Image itemImage;
     private RectTransform imageTransform;
-    public TextMeshProUGUI quantityTxt;
+    private TextMeshProUGUI quantityTxt;
     private RectTransform txtTransform;
 
     //public GameObject item_go;
@@ -78,16 +79,23 @@ public class InventorySlot : MonoBehaviour, IPointerDownHandler, IBeginDragHandl
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // If released over another slot
+        // If released over some object
         if( eventData.pointerCurrentRaycast.gameObject != null )
         {
+            // If released over another slot
             if( eventData.pointerCurrentRaycast.gameObject.GetComponent<InventorySlot>() )
             {
                 Inventory.Instance.SwapSlots(this, eventData.pointerCurrentRaycast.gameObject.GetComponent<InventorySlot>() );
             }
+
+            Debug.Log("Dropped item on top of " + eventData.pointerCurrentRaycast.gameObject.name);
+        }
+        else
+        {
+            Inventory.Instance.DropItem(index);
         }
 
-        // If not on a slot, return item image to its normal position
+        // return item image to its normal position
         imageTransform.anchoredPosition = Vector2.zero;
         txtTransform.anchoredPosition = new Vector2(-5f, 5f);
 

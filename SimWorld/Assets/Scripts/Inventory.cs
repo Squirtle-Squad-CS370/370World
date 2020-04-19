@@ -34,16 +34,8 @@ public class Inventory : MonoBehaviour
         // Start out with empty slots
         for( int i = 0; i < numSlots; i++ )
         {
-            slots[i].isEmpty = true;
-            slots[i].itemImage.enabled = false;
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if( Input.GetKeyDown(KeyCode.Alpha1) )
-        {
-            DropItem(0);
+            slots[i].Clear();
+            slots[i].index = i;
         }
     }
 
