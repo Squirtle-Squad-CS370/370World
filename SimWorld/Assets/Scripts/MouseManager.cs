@@ -1,32 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MouseManager : MonoBehaviour
 {
-    #region Singleton
-
-    public static MouseManager Instance { get; protected set; }
-
-    void Awake()
-    {
-        // Make sure this is the only instance of AudioController
-        if (Instance != null)
-        {
-            Debug.LogError("MouseManager - Another MM already exists.");
-            return;
-        }
-
-        Instance = this;
-    }
-
-    #endregion
-
     [SerializeField]
-    private Texture2D crosshairCursorSprite;   // cursor for aiming weapons
+    private Sprite crosshairCursorSprite;   // cursor for aiming weapons
     [SerializeField]
     private Sprite tileSelectCursorSprite;  // cursor for selecting tiles
+    [SerializeField]
     private GameObject cursor_go;   // the active cursor game object
     private SpriteRenderer cursor_sr;   // active cursor's sprite renderer
 
@@ -39,9 +21,7 @@ public class MouseManager : MonoBehaviour
     void Start()
     {
         // Defaulting to crosshair for now
-        // Cursor.SetCursor(crosshairCursorSprite, Vector2.zero, CursorMode.ForceSoftware);
-        cursor_go = gameObject;
-        cursor_sr = GetComponent<SpriteRenderer>();
+        cursor_sr = cursor_go.GetComponent<SpriteRenderer>();
         SetCrosshairCursor();
     }
 
@@ -62,6 +42,13 @@ public class MouseManager : MonoBehaviour
 
     private void UpdateCursor()
     {
+        if( isCrosshair )
+        {
+            // Simply stay underneath the mouse
+            cursor_go.SetActive(true);
+            cursor_go.transform.position = new Vector3(currFramePosition.x, currFramePosition.y, 0);
+        }
+
         if( isTileSelect )
         {
             // Update the tile select cursor's position
@@ -81,16 +68,13 @@ public class MouseManager : MonoBehaviour
 
     public void SetCrosshairCursor()
     {
-        //Cursor.visible = true;
-        cursor_sr.enabled = false;
+        cursor_sr.sprite = crosshairCursorSprite;
 
         isCrosshair = true;
         isTileSelect = false;
     }
     public void SetTileSelectCursor()
     {
-        //Cursor.visible = false;
-        cursor_sr.enabled = true;
         cursor_sr.sprite = tileSelectCursorSprite;
 
         isTileSelect = true;
