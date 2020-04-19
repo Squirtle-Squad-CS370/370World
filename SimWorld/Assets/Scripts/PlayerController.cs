@@ -59,11 +59,11 @@ public class PlayerController : MonoBehaviour
         // Press 1 to shoot, 2 to build walls
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            mouseManager.SetCrosshairCursor();
+            MouseManager.Instance.SetCrosshairCursor();
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            mouseManager.SetTileSelectCursor();
+            MouseManager.Instance.SetTileSelectCursor();
         }
         
         spriteRenderer.sortingOrder = (int)rb.position.y;
