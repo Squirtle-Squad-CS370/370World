@@ -419,6 +419,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slot (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 505004341396341526, guid: 36788eb343c334b4895f768774c03c71,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 1562614350}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36788eb343c334b4895f768774c03c71, type: 3}
 --- !u!1 &319490172
@@ -1024,6 +1029,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slot (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 505004341396341526, guid: 36788eb343c334b4895f768774c03c71,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 1562614350}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36788eb343c334b4895f768774c03c71, type: 3}
 --- !u!1001 &628264131
@@ -1403,6 +1413,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slot (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 505004341396341526, guid: 36788eb343c334b4895f768774c03c71,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 1562614350}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36788eb343c334b4895f768774c03c71, type: 3}
 --- !u!1 &771407874
@@ -1679,6 +1694,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slot (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 505004341396341526, guid: 36788eb343c334b4895f768774c03c71,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 1562614350}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36788eb343c334b4895f768774c03c71, type: 3}
 --- !u!1001 &905137226
@@ -1798,6 +1818,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slot (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 505004341396341526, guid: 36788eb343c334b4895f768774c03c71,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 1562614350}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36788eb343c334b4895f768774c03c71, type: 3}
 --- !u!1001 &985374150
@@ -2216,6 +2241,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slot (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 505004341396341526, guid: 36788eb343c334b4895f768774c03c71,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 1562614350}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36788eb343c334b4895f768774c03c71, type: 3}
 --- !u!1001 &1529732031
@@ -3315,6 +3345,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slot
       objectReference: {fileID: 0}
+    - target: {fileID: 505004341396341526, guid: 36788eb343c334b4895f768774c03c71,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 1562614350}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36788eb343c334b4895f768774c03c71, type: 3}
 --- !u!1001 &1228459731830479746

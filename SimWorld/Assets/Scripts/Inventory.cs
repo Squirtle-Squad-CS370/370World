@@ -4,6 +4,24 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
+    #region Singleton
+
+    public static Inventory Instance { get; protected set; }
+
+    void Awake()
+    {
+        // Make sure this is the only instance of AudioController
+        if (Instance != null)
+        {
+            Debug.LogError("Inventory - Another Inventory already exists.");
+            return;
+        }
+
+        Instance = this;
+    }
+
+    #endregion
+
     private int numSlots = 7;
 
     public InventorySlot[] slots;
@@ -76,10 +94,7 @@ public class Inventory : MonoBehaviour
                 if (slots[i].isEmpty)
                 {
                     // Add item to slot
-                    slots[i].item = item;
-                    slots[i].itemImage.sprite = item.image;
-                    slots[i].isEmpty = false;
-                    slots[i].itemImage.enabled = true;
+                    slots[i].SetItem(item);
                     //itemAdded = true;
                     itemSlot = i;
 
@@ -113,40 +128,60 @@ public class Inventory : MonoBehaviour
         }
     }
     // Remove an item from the inventory
-    private void RemoveItem(int ID)
+    private void RemoveItem(int idx)
     {
-        if( slots[ID].isEmpty )
+        if( slots[idx].isEmpty )
         {
             Debug.Log("Inventory - attempted to remove item from empty slot.");
             return;
         }
 
-        slots[ID].item = null;
-        slots[ID].itemImage.sprite = null;
-        slots[ID].UpdateQuantity();
-        slots[ID].isEmpty = true;
-        slots[ID].itemImage.enabled = false;
+        slots[idx].Clear();
     }
     // Remove item and drop it on the ground
     // If no direction is specified, will throw it randomly
-    public void DropItem(int ID)
+    public void DropItem(int idx)
     {
         Vector3 dir = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized;
-        DropItem(ID, dir);
+        DropItem(idx, dir);
     }
-    public void DropItem(int ID, Vector3 dir)
+    public void DropItem(int idx, Vector3 dir)
     {
-        if( slots[ID].isEmpty )
+        if( slots[idx].isEmpty )
         {
             Debug.Log("Inventory - attempted to drop item from empty slot.");
             return;
         }
 
-        slots[ID].item.transform.position = transform.position;
-        slots[ID].item.go.SetActive(true);
-        slots[ID].item.rb.AddForce(dir * 100f, ForceMode2D.Impulse);
-        slots[ID].item.OnDrop();
+        slots[idx].item.transform.position = transform.position;
+        slots[idx].item.go.SetActive(true);
+        slots[idx].item.rb.AddForce(dir * 100f, ForceMode2D.Impulse);
+        slots[idx].item.OnDrop();
 
-        RemoveItem(ID);
+        RemoveItem(idx);
+    }
+    
+    public void SwapSlots(InventorySlot slot1, InventorySlot slot2)
+    {
+        // If both slots are occupied
+        if( !slot1.isEmpty && !slot2.isEmpty )
+        {
+            InventoryItem tmpItem = slot1.item;
+            slot1.SetItem(slot2.item);
+            slot2.SetItem(tmpItem);
+        }
+        // Only slot 1 has an item
+        else if( !slot1.isEmpty && slot2.isEmpty )
+        {
+            slot2.SetItem(slot1.item);
+            slot1.Clear();
+        }
+        // Only slot 2 has an item
+        else if( slot1.isEmpty && !slot2.isEmpty )
+        {
+            slot1.SetItem(slot2.item);
+            slot2.Clear();
+        }
+        // Otherwise neither slot is filled, do nothing
     }
 }
