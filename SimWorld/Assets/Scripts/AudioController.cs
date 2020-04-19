@@ -32,6 +32,7 @@ public class AudioController : MonoBehaviour
         // Play theme music!
     }
 
+    /*
     public void PlaySound(AudioClip audioClip)
     {
         // Make sure we have have our clip set up
@@ -46,8 +47,10 @@ public class AudioController : MonoBehaviour
         audioSource.PlayOneShot( audioClip );
         Destroy(sound_go, audioClip.length);
     }
-    // Overloaded version which plays sounds in world space
-    public void PlaySound(AudioClip audioClip, Vector3 position)
+    */
+
+    // Parameters with default values are optional
+    public void PlaySound( AudioClip audioClip, Vector3 position = default, bool pitchShift = false )
     {
         // Make sure we have have our clip set up
         if (audioClip == null)
@@ -55,16 +58,36 @@ public class AudioController : MonoBehaviour
             Debug.LogError("AudioController - No audioClip assigned");
             return;
         }
+
+        // Create GameObject for sound, set its parent, and add AudioSource component
         GameObject sound_go = new GameObject("Sound");
         sound_go.transform.SetParent(Instance.transform);
-        sound_go.transform.position = position;
         AudioSource audioSource = sound_go.AddComponent<AudioSource>();
-        audioSource.clip = audioClip;
-        audioSource.maxDistance = 100f;
-        audioSource.spatialBlend = 1f;
-        audioSource.rolloffMode = AudioRolloffMode.Linear;
-        audioSource.dopplerLevel = 0f;
-        audioSource.Play();
+
+        // If we have enabled pitch shifting... do that
+        if( pitchShift == true )
+        {
+            audioSource.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
+        }
+
+        // If we have provided a position, play in world space
+        if( position != default )
+        {
+            sound_go.transform.position = position;
+            audioSource.clip = audioClip;
+            audioSource.maxDistance = 100f;
+            audioSource.spatialBlend = 1f;
+            audioSource.rolloffMode = AudioRolloffMode.Linear;
+            audioSource.dopplerLevel = 0f;
+            audioSource.Play();
+        }
+        // Otherwise just play it outright
+        else
+        {
+            audioSource.PlayOneShot(audioClip);
+        }
+
+        // Destroy the sound GameObject now that we are done
         Destroy(sound_go, audioClip.length);
     }
 }

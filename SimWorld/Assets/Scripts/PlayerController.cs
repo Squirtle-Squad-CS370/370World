@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
                 case walkSpeed:
                     if( footstepSFXTimer <= 0 )
                     {
-                        AudioController.Instance.PlaySound(ac_footstep, transform.position);
+                        AudioController.Instance.PlaySound(ac_footstep, transform.position, true);
                         footstepSFXTimer = walkSFXTime;
                     }
                     footstepSFXTimer -= Time.deltaTime;
@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour
                 case runSpeed:
                     if( footstepSFXTimer <= 0 )
                     {
-                        AudioController.Instance.PlaySound(ac_footstep, transform.position);
+                        AudioController.Instance.PlaySound(ac_footstep, transform.position, true);
                         footstepSFXTimer = sprintSFXTime;
                     }
                     footstepSFXTimer -= Time.deltaTime;

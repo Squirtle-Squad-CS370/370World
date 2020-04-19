@@ -5,17 +5,20 @@ using System.Collections;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using System.IO;
+using System.Collections.Generic;
 using static Noise;
 
 //[System.Serializable]
 public class World : MonoBehaviour// maintain monobehaviour inheritance for use of Start()
 {
     // may consider switching to Tilemap in the future if environment gets detailed enough
-    Chunk[] chunks;
+    private List<Chunk> chunks;
     Chunk currentChunk;
     
     private GameObject rock;
     private GameObject tree;
+    private GameObject bush;
+    private GameObject grass;
     private float scale = 2.5F;
     private int chunkCount = 0;
     private int seed = 0;
@@ -45,18 +48,13 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         width = w;
         height = h;
         
-        chunks = new Chunk[width * height];
+        chunks = new List<Chunk>();
         currentChunk = null;
-
-        for (int i = 0; i < width * height; ++i)
-        {
-            chunks[i] = null;
-        }
-
-        //first chunk
-        //populateChunk(currentChunk);
         
-        //Debug.Log("Start chunk created with " + (currentChunk.w() * currentChunk.h()) + " tiles.");
+        rock = WorldController.Instance.rockPrefab;
+        tree = WorldController.Instance.treePrefab;
+        bush = WorldController.Instance.bushPrefab;
+        grass = WorldController.Instance.grassPrefab;
     }
 
     private void populateChunk(Chunk chunk)
@@ -81,12 +79,6 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 chunk.addTile(x, y, t);
             }
         }
-    }
-    
-    public void setPrefabs(GameObject r, GameObject t) 
-    {
-        rock = r;
-        tree = t;
     }
     
     public void setTile(int x, int y, Tile tile) 
@@ -124,10 +116,10 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     {
         string path = Application.persistentDataPath + "/world.370";
         
-        if (File.Exists(path)) 
+        if (false && File.Exists(path)) 
         {
-            TextReader reader = File.OpenText(path);
-            seed = int.Parse(reader.ReadLine());
+            load();
+            return;
         } 
         else 
         {
@@ -142,7 +134,8 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
             for (int y = 0; y < 2; ++y)
             {
                 Chunk c = new Chunk(x, y, chunkCount);
-                chunks[chunkCount++] = c;
+                chunks.Add(c);
+                ++chunkCount;
 
                 populateChunk(c);
                 CreateGround(c, seed);
@@ -155,39 +148,112 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
 
     public void save()
     {
+        //TODO(Skyler): Make it so it can overwrite the file if it is there. So a new game can be started.
         string path = Application.persistentDataPath + "/world.370";
         Debug.Log(path);
         
         StreamWriter sw = new StreamWriter(path);
         sw.WriteLine(string.Format("{0}", seed));
-        sw.Close();
-        
-        /*
-        DataContractSerializer ds = new DataContractSerializer(chunks[0].GetType());
-        MemoryStream ms = new MemoryStream();
+        sw.WriteLine(string.Format("{0}", chunkCount));
         
         for (int i = 0; i < chunkCount; ++i)
         {
-            ds.WriteObject(ms, chunks[i]);
+            Chunk c = chunks[i];
+            int w = c.w();
+            int h = c.h();
+            
+            sw.WriteLine(string.Format("{0},{1},{2}", c.id(), c.x(), c.y()));
+            
+            string chunkData = "";
+            
+            for (int y = 0; y < h; ++y)
+            {
+                for (int x = 0; x < w; ++x)
+                {
+                    chunkData += c.getTile(x, y).getZ() + ",";
+                }
+            }
+            
+            sw.WriteLine(chunkData);
         }
         
-        ms.Seek(0, SeekOrigin.Begin);
+        sw.Close();
+    }
+    
+    private void load()
+    {
+        //TODO(Skyler): Only load the needed chunks.
         
-        FileStream file = File.Create(Application.persistentDataPath + "/world.370");
-        file.Write(ms.GetBuffer(), 0, ms.GetBuffer().Length);
-        file.Close();
-        */
-        /*
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/world.370");
-
-        for (int i = 0; i < chunkCount; ++i) 
+        string path = Application.persistentDataPath + "/world.370";
+        
+        if (File.Exists(path)) 
         {
-            bf.Serialize(file, chunks[i]);
-        }
-
-        file.Close();
-        */
+            TextReader reader = File.OpenText(path);
+            seed = int.Parse(reader.ReadLine());
+            chunkCount = int.Parse(reader.ReadLine());
+            
+            for (int i = 0; i < chunkCount; ++i)
+            {
+                string cInfo = reader.ReadLine();
+                int start = 0;
+                int len = 1;
+                
+                while (cInfo[start + len] != ',')
+                {
+                    ++len;
+                }
+                
+                int cId = int.Parse(cInfo.Substring(start, len));
+                start = start + len + 1;
+                len = 1;
+                
+                while (cInfo[start + len] != ',')
+                {
+                    ++len;
+                }
+                
+                int cX = int.Parse(cInfo.Substring(start, len));
+                start = start + len + 1;
+                len = 1;
+                
+                while (start + len < cInfo.Length && cInfo[start + len] != ',')
+                {
+                    ++len;
+                }
+                
+                int cY = int.Parse(cInfo.Substring(start, len));
+                
+                Chunk c = new Chunk(cX, cY, cId);
+                chunks.Add(c);
+                populateChunk(c);
+                
+                string cData = reader.ReadLine();
+                string number = "";
+                int index = 0;
+                int x = 0;
+                int y = 0;
+                
+                for (int j = 0; j < c.w() * c.h(); ++j)
+                {
+                    while (index < cData.Length && cData[index] != ',')
+                    {
+                        number += cData[index++];
+                    }
+                    
+                    float z = float.Parse(number);
+                    number = "";
+                    ++index;
+                    
+                    setTileForVal(c, x, y, z);
+                    
+                    if (++x == 100)
+                    {
+                        x = 0;
+                        ++y;
+                    }
+                }
+            }
+        } 
     }
 
     private void CreateGround(Chunk chunk, int seed)
@@ -204,28 +270,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 int cy = y % 100;
                 
                 chunk.setZ(cx, cy, val);
-
-                if (isDirt(val)) 
-                {
-                    chunk.setType(cx, cy, Tile.TileType.Dirt);
-                }
-                else if (isGrass(val))
-                {
-                    chunk.setType(cx, cy, Tile.TileType.Grass);
-                }
-                else if (isWater(val))
-                {
-                    chunk.setType(cx, cy, Tile.TileType.Water);
-                }
-                else if (isSand(val))
-                {
-                    chunk.setType(cx, cy, Tile.TileType.Sand);
-                }
-                else
-                {
-                    chunk.setType(cx, cy, Tile.TileType.Floor);
-                    Debug.Log("val: " + val);
-                }
+                setTileForVal(chunk, cx, cy, val);
             }
         }
         
@@ -258,10 +303,43 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 {
                     GameObject t = Instantiate(tree, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
                     SpriteRenderer renderer = t.GetComponent<SpriteRenderer>();
-                    renderer.sortingOrder = y - 1;
+                    renderer.sortingOrder = y + 1;
                     chunk.addObject(t);
                 }
+                else if (placeBush(pval, fval, r))
+                {
+                    chunk.addObject(Instantiate(bush, new Vector3(x, y, 0), Quaternion.identity));
+                }
+                else if (placeGrass(pval, fval, r))
+                {
+                    chunk.addObject(Instantiate(grass, new Vector3(x, y, 0), Quaternion.identity));
+                }
             }
+        }
+    }
+    
+    private void setTileForVal(Chunk chunk, int x, int y, float val)
+    {
+        if (isDirt(val)) 
+        {
+            chunk.setType(x, y, Tile.TileType.Dirt);
+        }
+        else if (isGrass(val))
+        {
+            chunk.setType(x, y, Tile.TileType.Grass);
+        }
+        else if (isWater(val))
+        {
+            chunk.setType(x, y, Tile.TileType.Water);
+        }
+        else if (isSand(val))
+        {
+            chunk.setType(x, y, Tile.TileType.Sand);
+        }
+        else
+        {
+            chunk.setType(x, y, Tile.TileType.Floor);
+            Debug.Log("val: " + val);
         }
     }
     
@@ -292,6 +370,16 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     {
         //return (((pval >= 5.7 && pval <= 6) || (pval >= 4 && pval <= 4.2) || (pval >= 2.5 && pval <= 3)) && (UnityEngine.Random.Range(1, 4) == 2));
         return ((fval >= r && fval <= (r + 0.5)) && isGrass(pval) && (UnityEngine.Random.Range(1, 4) == 2));
+    }
+    
+    private bool placeBush(float pval, float fval, float r)
+    {
+        return ((pval >= r && pval <= (r + 0.5)) && isGrass(pval) && (UnityEngine.Random.Range(1, 14) == 3));
+    }
+    
+    private bool placeGrass(float pval, float fval, float r)
+    {
+        return (!placeTree(pval, fval, r) && !placeBush(pval, fval, r) && isGrass(pval) && (UnityEngine.Random.Range(1, 15) == 12));
     }
 
     public bool TileHasWalkableNeighbor(Tile tile)
