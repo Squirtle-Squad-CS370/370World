@@ -2902,8 +2902,8 @@ MonoBehaviour:
   - {fileID: 834722480}
   - {fileID: 1833230307}
   - {fileID: 1911915638}
-  pickUpSuccessSFX: {fileID: 0}
-  pickUpFailSFX: {fileID: 0}
+  pickUpSuccessSFX: {fileID: 8300000, guid: aa7611e5a1e79204abda95dd18588a38, type: 3}
+  pickUpFailSFX: {fileID: 8300000, guid: b613b02798d41e24a9c943daeaac07c4, type: 3}
 --- !u!1 &1976213589
 GameObject:
   m_ObjectHideFlags: 0
