@@ -73,13 +73,20 @@ public class PlayerController : MonoBehaviour
     // that means physics (movement) will have consistent speed
     void FixedUpdate()
     {
-        // move to the location that is the current position plus 
-        // (input direction vector * moveSpeed * [utility for consistent speed] )
-        rb.MovePosition(rb.position + moveInput * currentMoveSpeed * Time.fixedDeltaTime);
-
-        // Play sound effects
         if( moveInput != Vector2.zero )
         {
+            // move to the location that is the current position plus 
+            // (input direction vector * moveSpeed * [utility for consistent speed] )
+            Vector2 newPosition = rb.position + moveInput * currentMoveSpeed * Time.fixedDeltaTime;
+            //Tile t = WorldController.Instance.World.GetTileAt((int)newPosition.x, (int)newPosition.y);
+            
+            //TODO(Skyler): This only works in the first chunk. The player can't leave the first chunk.
+            //if (t.isWalkable)
+            //{
+                rb.MovePosition(newPosition);
+            //}
+            
+            // Play sound effects
             switch( currentMoveSpeed )
             {
                 case walkSpeed:
@@ -107,6 +114,4 @@ public class PlayerController : MonoBehaviour
             footstepSFXTimer = 0f;
         }
     }
-
-
 }
