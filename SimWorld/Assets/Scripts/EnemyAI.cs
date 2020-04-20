@@ -21,19 +21,17 @@ public class EnemyAI : MonoBehaviour
     private Transform target; //Could be the player or a turret.
     private float bulletSpeed = 6;
     
-    [Header("Sprite Settings")]
-    [SerializeField]
-    private Sprite bulletSprite;
     [SerializeField]
     private GameObject bulletPrefab;
     
     [Header("Sound Settings")]
-    public AudioClip ac_targetLock;
     public AudioClip ac_shoot;
     
     // Start is called before the first frame update
     void Start()
     {
+        //ac_shoot = AudioController.Instance.ac_shoot;
+        //bulletPrefab = (GameObject)Resources.Load("prefabs/TEST_Bullet", typeof(GameObject));
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
@@ -81,22 +79,20 @@ public class EnemyAI : MonoBehaviour
     
     private void Shoot()
     {
-        if (target == null)
+        if (target != null)
         {
-            return;
-        }
+            Vector3 dir = (target.position - transform.position).normalized;
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
+            Quaternion rot = Quaternion.Euler(0, 0, angle);
 
-        Vector3 dir = (target.position - transform.position).normalized;
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
-        Quaternion rot = Quaternion.Euler(0, 0, angle);
-        
-        // Create a bullet
-        GameObject bullet = Instantiate(bulletPrefab, transform.position, rot);
-        Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<Collider2D>());
-        bullet.transform.SetParent(transform);
-        // Play sfx
-        AudioController.Instance.PlaySound(ac_shoot, transform.position);
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);      
+            // Create a bullet
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, rot);
+            Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+            bullet.transform.SetParent(transform);
+            // Play sfx
+            AudioController.Instance.PlaySound(ac_shoot, transform.position);
+            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+            rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
+        }
     }
 }
