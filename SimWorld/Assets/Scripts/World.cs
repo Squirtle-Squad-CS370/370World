@@ -15,10 +15,10 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     private List<Chunk> chunks;
     Chunk currentChunk;
     
-    private GameObject rock;
-    private GameObject tree;
-    private GameObject bush;
-    private GameObject grass;
+    private GameObject rockPrefab;
+    private GameObject treePrefab;
+    private GameObject bushPrefab;
+    private GameObject grassPrefab;
     private float scale = 2.5F;
     private int chunkCount = 0;
     private int seed = 0;
@@ -51,10 +51,10 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         chunks = new List<Chunk>();
         currentChunk = null;
         
-        rock = WorldController.Instance.rockPrefab;
-        tree = WorldController.Instance.treePrefab;
-        bush = WorldController.Instance.bushPrefab;
-        grass = WorldController.Instance.grassPrefab;
+        rockPrefab = WorldController.Instance.rockPrefab;
+        treePrefab = WorldController.Instance.treePrefab;
+        bushPrefab = WorldController.Instance.bushPrefab;
+        grassPrefab = WorldController.Instance.grassPrefab;
     }
 
     private void populateChunk(Chunk chunk)
@@ -296,23 +296,30 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
                 {
                     if (UnityEngine.Random.Range(1, 20) == 4) 
                     {
-                        chunk.addObject(Instantiate(rock, new Vector3(x, y, 0), Quaternion.identity));
+                        GameObject rock = Instantiate(rockPrefab, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
+                        rock.transform.SetParent(WorldController.Instance.transform, true);
+                        chunk.addObject(rock);
                     }
                 } 
                 else if (placeTree(pval, fval, r))
                 {
-                    GameObject t = Instantiate(tree, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
+                    GameObject t = Instantiate(treePrefab, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
+                    t.transform.SetParent(WorldController.Instance.transform, true);
                     SpriteRenderer renderer = t.GetComponent<SpriteRenderer>();
                     renderer.sortingOrder = y + 1;
                     chunk.addObject(t);
                 }
                 else if (placeBush(pval, fval, r))
                 {
-                    chunk.addObject(Instantiate(bush, new Vector3(x, y, 0), Quaternion.identity));
+                    GameObject bush = Instantiate(bushPrefab, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
+                    chunk.addObject(bush);
+                    bush.transform.SetParent(WorldController.Instance.transform, true);
                 }
                 else if (placeGrass(pval, fval, r))
                 {
-                    chunk.addObject(Instantiate(grass, new Vector3(x, y, 0), Quaternion.identity));
+                    GameObject grass = Instantiate(grassPrefab, new Vector3(x, y, 0), Quaternion.identity) as GameObject;
+                    grass.transform.SetParent(WorldController.Instance.transform, true);
+                    chunk.addObject(grass);
                 }
             }
         }
