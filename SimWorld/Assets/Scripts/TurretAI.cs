@@ -22,8 +22,8 @@ public class TurretAI : MonoBehaviour
     private float bulletSpeed;
 
     [Header("Sprite Settings")]
-    [SerializeField]
-    private Sprite bulletSprite;
+    //[SerializeField]
+    //private Sprite bulletSprite;
     [SerializeField]
     private GameObject bulletPrefab;
 
@@ -39,6 +39,16 @@ public class TurretAI : MonoBehaviour
     {
         // Initialize our enemy detection collider's size
         GetComponent<CircleCollider2D>().radius = attackRange;
+        if( GetComponent<Installable>().isInstalled )
+        {
+            this.enabled = true;
+            GetComponent<InventoryItem>().enabled = false;
+        }
+        else
+        {
+            this.enabled = false;
+            GetComponent<InventoryItem>().enabled = true;
+        }
     }
 
     void FixedUpdate()
@@ -127,10 +137,15 @@ public class TurretAI : MonoBehaviour
             // Create a bullet
             GameObject bullet = Instantiate(bulletPrefab, transform.position, rot);
             bullet.transform.SetParent(transform);
+
             // Play sfx
             AudioController.Instance.PlaySound(ac_shoot, transform.position);
-            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
+
+            // don't shoot ourselves
+            Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<BoxCollider2D>());
+
+            Rigidbody2D bullet_rb = bullet.GetComponent<Rigidbody2D>();
+            bullet_rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
         }      
     }
 }

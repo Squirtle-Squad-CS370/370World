@@ -2,6 +2,24 @@
 
 public class PlayerController : MonoBehaviour
 {
+    #region Singleton
+
+    public static PlayerController Instance { get; protected set; }
+
+    void Awake()
+    {
+        // Make sure this is the only instance of AudioController
+        if (Instance != null)
+        {
+            Debug.LogError("PlayerController - Another PC already exists.");
+            return;
+        }
+
+        Instance = this;
+    }
+
+    #endregion
+
     [Header("Movement Settings")]
     [SerializeField]
     private const float runSpeed = 8f;
@@ -22,6 +40,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput; // will be used to store player input between Update & Fixed
     private float currentMoveSpeed;
     private float footstepSFXTimer = 0f;
+
+    private InventoryItem equippedItem = null;
 
     // Start is called before the first frame update
     void Start()
@@ -52,15 +72,27 @@ public class PlayerController : MonoBehaviour
         // animator.SetFloat("Horizontal", movement.x);
         // animator.SetFloat("Vertical", movement.y);
 
-        // Toolbar hotkey functionality - may be encapsulated later?
-        // Press 1 to shoot, 2 to build walls
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if( Input.GetMouseButtonDown(0) )
         {
-            MouseManager.Instance.SetCrosshairCursor();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            MouseManager.Instance.SetTileSelectCursor();
+            if( equippedItem != null )
+            {
+                if( equippedItem.GetComponent<Installable>() != null )
+                {
+                    Installable tmp;
+                    if (equippedItem.quantity > 1)
+                    {
+                        tmp = Instantiate(equippedItem).GetComponent<Installable>();
+                    }
+                    else
+                    {
+                        tmp = equippedItem.GetComponent<Installable>();
+                    }
+                    Unequip();
+                    Inventory.Instance.RemoveItem();
+                    tmp.gameObject.SetActive(true);
+                    MouseManager.Instance.GetTileUnderMouse().Install(tmp);
+                }
+            }
         }
         
         spriteRenderer.sortingOrder = (int)rb.position.y;
@@ -110,5 +142,31 @@ public class PlayerController : MonoBehaviour
         {
             footstepSFXTimer = 0f;
         }
+    }
+
+    public void Equip(InventoryItem item)
+    {
+        if( equippedItem == item )
+        {
+            Unequip();
+            return;
+        }
+
+        equippedItem = item;
+
+        if( equippedItem.GetComponent<Installable>() != null )
+        {
+            MouseManager.Instance.SetTileSelectCursor();
+        }
+        else
+        {
+            MouseManager.Instance.SetCrosshairCursor();
+        }
+
+    }
+    public void Unequip()
+    {
+        equippedItem = null;
+        MouseManager.Instance.SetCrosshairCursor();
     }
 }

@@ -29,6 +29,8 @@ public class Bullet : MonoBehaviour
     */
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        Debug.Log("Bullet has hit " + collision.gameObject.name);
+
          // If it's a destructible object, make it take damage
         Destructible d = collision.gameObject.GetComponent<Destructible>();
         if( d ) // will return false if d is null

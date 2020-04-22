@@ -9,6 +9,7 @@ public class InventoryItem : MonoBehaviour
     public Sprite image;
     public bool isStackable;
     public int quantity = 1;
+    public bool isEquipable;
 
     [HideInInspector]
     public GameObject go;

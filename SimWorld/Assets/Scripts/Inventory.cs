@@ -23,6 +23,7 @@ public class Inventory : MonoBehaviour
     #endregion
 
     private int numSlots = 7;
+    public int highlightedSlot;
 
     public InventorySlot[] slots;
 
@@ -39,11 +40,45 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        // Testing with first 3 slots
+        if( Input.GetKey(KeyCode.Alpha1) )
+        {
+            if( slots[0].item.isEquipable )
+            {
+                PlayerController.Instance.Equip(slots[0].item);
+                highlightedSlot = 0;
+            }
+        }
+        if (Input.GetKey(KeyCode.Alpha2))
+        {
+            if (slots[1].item.isEquipable)
+            {
+                PlayerController.Instance.Equip(slots[1].item);
+                highlightedSlot = 1;
+            }
+        }
+        if (Input.GetKey(KeyCode.Alpha3))
+        {
+            if (slots[2].item.isEquipable)
+            {
+                PlayerController.Instance.Equip(slots[2].item);
+                highlightedSlot = 2;
+            }
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // If we collide with an item, pick it up
         if( collision.gameObject.tag == "Item" )
         {
+            // If installed & item capabilities deactivated
+            if( collision.gameObject.GetComponent<InventoryItem>().enabled == false)
+            {
+                return;
+            }
             GameObject itemPickedUp = collision.gameObject;
             InventoryItem item = itemPickedUp.GetComponent<InventoryItem>();
             AddItem(item);
@@ -65,8 +100,10 @@ public class Inventory : MonoBehaviour
                 {
                     // Add to quantity
                     slots[i].item.quantity += item.quantity;
-                    //itemAdded = true;
-                    itemSlot = i;
+
+                    Destroy(item.gameObject);   // free up memory
+
+                    itemSlot = i; // itemAdded = true
 
                     // Item has been added to stack,
                     // so we break out of loop
@@ -120,7 +157,7 @@ public class Inventory : MonoBehaviour
         }
     }
     // Remove an item from the inventory
-    private void RemoveItem(int idx)
+    private void RemoveItem(int idx, int qty = 1)
     {
         if( slots[idx].isEmpty )
         {
@@ -128,16 +165,37 @@ public class Inventory : MonoBehaviour
             return;
         }
 
+        if( slots[idx].item.quantity > qty )
+        {
+            slots[idx].item.quantity -= qty;
+            slots[idx].UpdateQuantity();
+            return;
+        }
+        else if( slots[idx].item.quantity < qty )
+        {
+            Debug.Log("Inventory - tried to drop " + qty + " of " + slots[idx].item.name + ", but only have " + slots[idx].item.quantity);
+            return;
+        }
+        
+        // slots[idx].item.quantity == qty
         slots[idx].Clear();
     }
+    // If no index is given, remove highlighted (equipped) item
+    public void RemoveItem(int qty = 1)
+    {
+        RemoveItem(highlightedSlot, qty);
+    }
+
     // Remove item and drop it on the ground
     // If no direction is specified, will throw it randomly
+    /*
     public void DropItem(int idx)
     {
         Vector3 dir = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized;
         DropItem(idx, dir);
     }
-    public void DropItem(int idx, Vector3 dir)
+    */
+    public void DropItem(int idx, int qty = 1)//Vector3 dir)
     {
         if( slots[idx].isEmpty )
         {
@@ -145,10 +203,25 @@ public class Inventory : MonoBehaviour
             return;
         }
 
-        slots[idx].item.transform.position = transform.position;
-        slots[idx].item.go.SetActive(true);
-        slots[idx].item.rb.AddForce(dir * 100f, ForceMode2D.Impulse);
-        slots[idx].item.OnDrop();
+        InventoryItem tmpItem;
+
+        if ( slots[idx].item.quantity > qty)
+        {
+            tmpItem = Instantiate(slots[idx].item);
+            tmpItem.quantity = qty;
+        }
+        else
+        {
+            tmpItem = slots[idx].item;
+        }
+
+        Vector3 dir = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized;
+
+        tmpItem.transform.position = transform.position;
+        tmpItem.go.SetActive(true);
+        tmpItem.rb.isKinematic = false;
+        tmpItem.rb.AddForce(dir * 100f, ForceMode2D.Impulse);
+        tmpItem.OnDrop();
 
         RemoveItem(idx);
     }
