@@ -103,6 +103,11 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
 
         for (int i = 0; i < width * height; ++i) 
         {
+            if (i >= chunks.Count)
+            {
+                return null;
+            }
+            
             Chunk c = chunks[i];
             if ((x >= c.x() && x <= c.x() + c.w()) && (y >= c.y() && y <= c.y() + c.h()))
             {

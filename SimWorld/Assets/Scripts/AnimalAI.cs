@@ -112,6 +112,11 @@ public class AnimalAI : MonoBehaviour
         {
             positionToCheck += transform.forward;
             Tile tileToCheck = WorldController.Instance.GetTileAtWorldCoord(positionToCheck);
+            if (tileToCheck == null)
+            {
+                //Destroy(GetComponent<GameObject>());
+                return;
+            }
 
             // If the tile there is not walkable, change course
             if (!tileToCheck.isWalkable)

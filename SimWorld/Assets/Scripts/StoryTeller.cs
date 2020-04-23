@@ -64,7 +64,7 @@ public class StoryTeller : MonoBehaviour
             }
             
             //TODO(Skyler): Have the time and numEnemies based on the dificulty.
-            yield return new WaitForSeconds(UnityEngine.Random.Range(4 * 60, 6 * 60)); //Wait 4 to 6 minutes
+            yield return new WaitForSeconds(UnityEngine.Random.Range(3 * 60, 4 * 60)); //Wait 3 to 4 minutes
         }
     }
     
