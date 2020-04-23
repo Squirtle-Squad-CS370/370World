@@ -20,7 +20,7 @@ public class EnemyController : MonoBehaviour
     {
         //The first one will take longer then the others.
         //TODO(Skyler): Have the time and numEnemies based on the dificulty.
-        raidTimer = UnityEngine.Random.Range(420, 450); //just blaze
+        raidTimer = 5;//UnityEngine.Random.Range(420, 450); //just blaze
     }
 
     void Update()
@@ -34,7 +34,7 @@ public class EnemyController : MonoBehaviour
         
         if (raidTimer <= 0)
         {
-            raidTimer = UnityEngine.Random.Range(350, 420); //blaze it
+            raidTimer = 5;//UnityEngine.Random.Range(350, 420); //blaze it
             if ((int)UnityEngine.Random.Range(1, 3) == 2)
             {
                 doRaid();

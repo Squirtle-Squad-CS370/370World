@@ -30,6 +30,9 @@ public class AudioController : MonoBehaviour
     private void Start()
     {
         // Play theme music!
+        
+        //Used for developing while listening to music.
+        AudioListener.volume = 0;
     }
 
     /*

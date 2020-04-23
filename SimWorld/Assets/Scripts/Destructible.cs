@@ -46,7 +46,7 @@ public class Destructible : MonoBehaviour
         // Spawn any drops
         if (dropPrefab != null)
         {
-            Instantiate(dropPrefab);
+            Instantiate(dropPrefab, transform.position, Quaternion.identity);
         }
 
         // Die
