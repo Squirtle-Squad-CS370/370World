@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 227853300}
   - component: {fileID: 227853299}
   m_Layer: 0
-  m_Name: EnemyController
+  m_Name: StoryTeller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -285,6 +285,11 @@ MonoBehaviour:
     type: 3}
   bulletPrefab: {fileID: 5801895077872095944, guid: 802aa1ce005a26843a33361cd817403d,
     type: 3}
+  rabbitPrefab: {fileID: 668142991214614100, guid: 3eb7409759a666f45944c798c7bd078e,
+    type: 3}
+  pigPrefab: {fileID: 2830761410609382186, guid: 517d44003abcfdf44925a3266146f4b0,
+    type: 3}
+  world: {fileID: 1821309136}
 --- !u!4 &227853300
 Transform:
   m_ObjectHideFlags: 0

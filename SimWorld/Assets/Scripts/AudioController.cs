@@ -34,6 +34,22 @@ public class AudioController : MonoBehaviour
         //Used for developing while listening to music.
         //AudioListener.volume = 0;
     }
+    
+    private void Update()
+    {
+        //mute/unmute
+        if (Input.GetKeyDown("m"))
+        {
+            if (AudioListener.volume != 0)
+            {
+                AudioListener.volume = 0;
+            }
+            else
+            {
+                AudioListener.volume = 1;
+            }
+        }
+    }
 
     /*
     public void PlaySound(AudioClip audioClip)

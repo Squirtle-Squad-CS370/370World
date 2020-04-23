@@ -30,6 +30,11 @@ public class AnimalAI : MonoBehaviour
         isWandering = false;
         idleTimer = UnityEngine.Random.Range(minIdleTime, maxIdleTime);
     }
+    
+    void onDestroy()
+    {
+        WorldController.Instance.World.removeAnimal();
+    }
 
     private void Update()
     {
