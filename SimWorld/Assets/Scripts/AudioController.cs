@@ -32,7 +32,7 @@ public class AudioController : MonoBehaviour
         // Play theme music!
         
         //Used for developing while listening to music.
-        AudioListener.volume = 0;
+        //AudioListener.volume = 0;
     }
 
     /*
