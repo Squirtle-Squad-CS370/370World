@@ -59,7 +59,7 @@ public class InventorySlot : MonoBehaviour, IPointerDownHandler, IBeginDragHandl
     // UI functionality
     public void OnPointerDown(PointerEventData eventData)
     {
-
+        Inventory.Instance.Interact();
     }
 
     public void OnBeginDrag(PointerEventData eventData)

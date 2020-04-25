@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 227853300}
   - component: {fileID: 227853299}
   m_Layer: 0
-  m_Name: EnemyController
+  m_Name: StoryTeller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -281,10 +281,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4c7e7f4ce645ef459d2c52a05f2565c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gunPrefab: {fileID: 8185796278749586211, guid: 5548b61f5dcfc42d4a711c35a7276675,
+    type: 3}
   enemyPrefab: {fileID: 2576293660583483412, guid: b8f789d44a9b7444f9f9870831751f92,
     type: 3}
   bulletPrefab: {fileID: 5801895077872095944, guid: 802aa1ce005a26843a33361cd817403d,
     type: 3}
+  rabbitPrefab: {fileID: 668142991214614100, guid: 3eb7409759a666f45944c798c7bd078e,
+    type: 3}
+  pigPrefab: {fileID: 2830761410609382186, guid: 517d44003abcfdf44925a3266146f4b0,
+    type: 3}
+  world: {fileID: 1821309136}
 --- !u!4 &227853300
 Transform:
   m_ObjectHideFlags: 0
@@ -2879,8 +2886,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ac_footstep: {fileID: 8300000, guid: f028a0243ffb0f843a636ad8a4c31b3d, type: 3}
+  ac_shoot: {fileID: 8300000, guid: 49f7480278edfa3468cc76403d364986, type: 3}
   walkSFXTime: 0.42
   sprintSFXTime: 0.2
+  bulletPrefab: {fileID: 5801895077872095944, guid: 802aa1ce005a26843a33361cd817403d,
+    type: 3}
 --- !u!50 &1955360803
 Rigidbody2D:
   serializedVersion: 4
@@ -2894,7 +2904,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 10
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}

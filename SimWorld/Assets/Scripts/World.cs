@@ -22,6 +22,7 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
     private float scale = 2.5F;
     private int chunkCount = 0;
     private int seed = 0;
+    private int animalCount = 0;
 
     // The height and width variables are made properties with accessors
     private int width;  // width of the map, measured in chunks
@@ -102,6 +103,11 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
 
         for (int i = 0; i < width * height; ++i) 
         {
+            if (i >= chunks.Count)
+            {
+                return null;
+            }
+            
             Chunk c = chunks[i];
             if ((x >= c.x() && x <= c.x() + c.w()) && (y >= c.y() && y <= c.y() + c.h()))
             {
@@ -110,6 +116,24 @@ public class World : MonoBehaviour// maintain monobehaviour inheritance for use 
         }
         
         return null;
+    }
+    
+    public int getAnimalCount()
+    {
+        return animalCount;
+    }
+    
+    public void addAnimal()
+    {
+        ++animalCount;
+    }
+    
+    public void removeAnimal()
+    {
+        if (animalCount > 0)
+        {
+            --animalCount;
+        }
     }
     
     public void Generate() 

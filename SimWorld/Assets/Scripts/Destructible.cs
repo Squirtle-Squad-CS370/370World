@@ -11,6 +11,10 @@ public class Destructible : MonoBehaviour
     // What this object will drop when destroyed:
     private GameObject dropPrefab;
     [SerializeField]
+    //How often it will drop. By default it will drop 100% of the time.
+    [Tooltip("Between 0 and 1")]
+    private float dropRate = 1.0f;
+    [SerializeField]
     private AudioClip ac_hit;
     [SerializeField]
     private AudioClip ac_destroyed;
@@ -44,9 +48,9 @@ public class Destructible : MonoBehaviour
         AudioController.Instance.PlaySound(ac_destroyed, transform.position);
 
         // Spawn any drops
-        if (dropPrefab != null)
+        if (dropPrefab != null && Random.value <= dropRate)
         {
-            Instantiate(dropPrefab);
+            Instantiate(dropPrefab, transform.position, Quaternion.identity);
         }
 
         // Die

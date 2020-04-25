@@ -10,10 +10,14 @@ public class PlayerController : MonoBehaviour
 
     [Header("SFX Settings")]
     public AudioClip ac_footstep;
+    public AudioClip ac_shoot;
     [SerializeField]
     private float walkSFXTime;  // time between footstep sfx when walking
     [SerializeField]
     private float sprintSFXTime;    // time between footstep sfx when sprinting
+    
+    [SerializeField]
+    private GameObject bulletPrefab;
 
     // Internal use only
     private Rigidbody2D rb;
@@ -22,6 +26,10 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput; // will be used to store player input between Update & Fixed
     private float currentMoveSpeed;
     private float footstepSFXTimer = 0f;
+    private float bulletSpeed = 2;
+    private bool canShoot = true;
+    private float timeBetweenShots = 1.5f;
+    private float shootTimer = 1.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -61,6 +69,14 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             MouseManager.Instance.SetTileSelectCursor();
+        }
+        
+        //shoot on left click
+        //TODO(Skyler): For testing. Needs to check if gun is equiped/has ammo.
+        //TODO(Skyler): Don't shoot when accessing game UI. DONE
+        if (Input.GetMouseButtonDown(0) && canShoot && !Inventory.Instance.beingInteractedWith())
+        {
+            shoot();
         }
         
         spriteRenderer.sortingOrder = (int)rb.position.y;
@@ -110,5 +126,39 @@ public class PlayerController : MonoBehaviour
         {
             footstepSFXTimer = 0f;
         }
+        
+        if (timeBetweenShots <= 0)
+        {
+            canShoot = true;
+        }
+        else
+        {
+            timeBetweenShots -= Time.deltaTime;
+        }
+    }
+    
+    private void shoot()
+    {
+        canShoot = false;
+        shootTimer = timeBetweenShots;
+        
+        //For some reason if you subtract the vectors the spped depends on the distance. That's why x and y are done separately.
+        Vector3 dir = new Vector3();
+        dir.x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - rb.transform.position.x;
+        dir.y = Camera.main.ScreenToWorldPoint(Input.mousePosition).y - rb.transform.position.y;
+        dir = dir.normalized;
+        
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
+        Quaternion rot = Quaternion.Euler(0, 0, angle);
+
+        // Create a bullet
+        GameObject bullet = Instantiate(bulletPrefab, rb.transform.position, rot);
+        Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+        bullet.transform.SetParent(transform);
+        // Play sfx
+        AudioController.Instance.PlaySound(ac_shoot, rb.transform.position);
+        Rigidbody2D rbb = bullet.GetComponent<Rigidbody2D>();
+        //TODO(Skyler): Bug: The closer the mouse is to the player the slower the bullet is.
+        rbb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
     }
 }

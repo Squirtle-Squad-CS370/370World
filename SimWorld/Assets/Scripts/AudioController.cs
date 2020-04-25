@@ -30,6 +30,25 @@ public class AudioController : MonoBehaviour
     private void Start()
     {
         // Play theme music!
+        
+        //Used for developing while listening to music.
+        //AudioListener.volume = 0;
+    }
+    
+    private void Update()
+    {
+        //mute/unmute
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if (AudioListener.volume != 0)
+            {
+                AudioListener.volume = 0;
+            }
+            else
+            {
+                AudioListener.volume = 1;
+            }
+        }
     }
 
     /*
