@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput; // will be used to store player input between Update & Fixed
     private float currentMoveSpeed;
     private float footstepSFXTimer = 0f;
-    private float bulletSpeed = 6;
+    private float bulletSpeed = 2;
     private bool canShoot = true;
     private float timeBetweenShots = 1.5f;
     private float shootTimer = 1.5f;
@@ -73,8 +73,8 @@ public class PlayerController : MonoBehaviour
         
         //shoot on left click
         //TODO(Skyler): For testing. Needs to check if gun is equiped/has ammo.
-        //TODO(Skyler): Don't shoot when accessing game UI.
-        if (Input.GetMouseButtonDown(0) && canShoot)
+        //TODO(Skyler): Don't shoot when accessing game UI. DONE
+        if (Input.GetMouseButtonDown(0) && canShoot && !Inventory.Instance.beingInteractedWith())
         {
             shoot();
         }
@@ -142,7 +142,12 @@ public class PlayerController : MonoBehaviour
         canShoot = false;
         shootTimer = timeBetweenShots;
         
-        Vector3 dir = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - rb.transform.position).normalized;
+        //For some reason if you subtract the vectors the spped depends on the distance. That's why x and y are done separately.
+        Vector3 dir = new Vector3();
+        dir.x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - rb.transform.position.x;
+        dir.y = Camera.main.ScreenToWorldPoint(Input.mousePosition).y - rb.transform.position.y;
+        dir = dir.normalized;
+        
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
         Quaternion rot = Quaternion.Euler(0, 0, angle);
 

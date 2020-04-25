@@ -38,7 +38,7 @@ public class AudioController : MonoBehaviour
     private void Update()
     {
         //mute/unmute
-        if (Input.GetKeyDown("m"))
+        if (Input.GetKeyDown(KeyCode.M))
         {
             if (AudioListener.volume != 0)
             {

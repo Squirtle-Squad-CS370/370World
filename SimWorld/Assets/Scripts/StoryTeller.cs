@@ -6,6 +6,8 @@ using UnityEngine;
 public class StoryTeller : MonoBehaviour
 {
     [SerializeField]
+    private GameObject gunPrefab;
+    [SerializeField]
     private GameObject enemyPrefab;
     [SerializeField]
     private GameObject bulletPrefab;
@@ -29,18 +31,26 @@ public class StoryTeller : MonoBehaviour
         
         StartCoroutine(doRaid());
         StartCoroutine(spawnAnimal());
+        
+        spawnStarterItems();
     }
     
-    private Vector3 getSpawnPos()
+    //Get a spawn pos relative to the player. If fuzzy is true it will add a little more randomness, good for spawning many things in one spot.
+    private Vector3 getSpawnPos(int closeDist, int farDist, bool fuzzy = true)
     {
         bool isNegative = (UnityEngine.Random.value <= 0.5f);
         float dir = UnityEngine.Random.Range(1, 360);
-        float dist = UnityEngine.Random.Range(20, 30);
-        float a = dist * (float)Math.Sin((Math.PI / 180) * dir) + UnityEngine.Random.Range(3, 5);
-        float b = (float)Math.Sqrt(Math.Abs(Math.Pow(dist, 2) - Math.Pow(a, 2))) + UnityEngine.Random.Range(3, 5);
+        float dist = UnityEngine.Random.Range(closeDist, farDist);
+        float a = dist * (float)Math.Sin((Math.PI / 180) * dir) + ((fuzzy ? UnityEngine.Random.Range(3, 5) : 0) * (isNegative ? -1 : 1));
+        float b = (float)Math.Sqrt(Math.Abs(Math.Pow(dist, 2) - Math.Pow(a, 2))) + ((fuzzy ? UnityEngine.Random.Range(3, 5) : 0) * (isNegative ? -1 : 1));
         
         //For some reason this will only do 180 degrees around the player. So the isNegative is to make it a full circle.
         return player.transform.position + new Vector3(a, b, 0) * (isNegative ? -1 : 1);
+    }
+    
+    private void spawnStarterItems()
+    {
+        Instantiate(gunPrefab, getSpawnPos(2, 3, false), Quaternion.identity);
     }
     
     IEnumerator doRaid()
@@ -55,7 +65,7 @@ public class StoryTeller : MonoBehaviour
                 
                 for (int i = 0; i < numEnemies; ++i)
                 {
-                    Instantiate(enemyPrefab, getSpawnPos(), Quaternion.identity);
+                    Instantiate(enemyPrefab, getSpawnPos(20, 30), Quaternion.identity);
                 }
             }
             else
@@ -96,12 +106,12 @@ public class StoryTeller : MonoBehaviour
                 
         if (val <= 5)
         {
-            GameObject r = Instantiate(rabbitPrefab, getSpawnPos(), Quaternion.identity) as GameObject;
+            GameObject r = Instantiate(rabbitPrefab, getSpawnPos(20, 30), Quaternion.identity) as GameObject;
             r.transform.SetParent(WorldController.Instance.transform, true);
         }
         else 
         {
-            GameObject p = Instantiate(pigPrefab, getSpawnPos(), Quaternion.identity) as GameObject;
+            GameObject p = Instantiate(pigPrefab, getSpawnPos(20, 30), Quaternion.identity) as GameObject;
             p.transform.SetParent(WorldController.Instance.transform, true);
         }
         

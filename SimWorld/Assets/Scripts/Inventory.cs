@@ -23,6 +23,8 @@ public class Inventory : MonoBehaviour
     #endregion
 
     private int numSlots = 7;
+    //True if the user clicks on the UI. Used so you can't shoot while interacting with the UI.
+    private bool interactedWith = false;
 
     public InventorySlot[] slots;
 
@@ -37,6 +39,11 @@ public class Inventory : MonoBehaviour
             slots[i].Clear();
             slots[i].index = i;
         }
+    }
+    
+    void Update()
+    {
+        interactedWith = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -175,5 +182,16 @@ public class Inventory : MonoBehaviour
             slot2.Clear();
         }
         // Otherwise neither slot is filled, do nothing
+    }
+    
+    //Say the UI is being interacted with.
+    public void Interact()
+    {
+        interactedWith = true;
+    }
+    
+    public bool beingInteractedWith()
+    {
+        return interactedWith;
     }
 }
