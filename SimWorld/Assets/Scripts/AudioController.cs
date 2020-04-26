@@ -40,6 +40,7 @@ public class AudioController : MonoBehaviour
         //mute/unmute
         if (Input.GetKeyDown(KeyCode.M))
         {
+            //Fore some reason this seems to randomly work.
             if (AudioListener.volume != 0)
             {
                 AudioListener.volume = 0;

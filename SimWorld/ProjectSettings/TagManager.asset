@@ -8,6 +8,7 @@ TagManager:
   - Bullet
   - Item
   - Animal
+  - InventorySelection
   layers:
   - Default
   - TransparentFX
