@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
@@ -27,6 +28,13 @@ public class Inventory : MonoBehaviour
     private bool interactedWith = false;
 
     public InventorySlot[] slots;
+    private GameObject selection;
+    private int currentIndex = 0;
+    //By default the selection starts in the bottom left of the screen.
+    //This gives some time so we can set the selection when it is ready.
+    //If it is called immediately then it will be on the bottom left of the slot. Kinda janky.
+    private bool firstSelectionSet = false;
+    private float firstSelectionTimer = 0.1f;
 
     public AudioClip pickUpSuccessSFX;
     public AudioClip pickUpFailSFX;
@@ -39,11 +47,28 @@ public class Inventory : MonoBehaviour
             slots[i].Clear();
             slots[i].index = i;
         }
+        
+        selection = GameObject.FindGameObjectWithTag("InventorySelection");
     }
     
     void Update()
     {
         interactedWith = false;
+    }
+    
+    void FixedUpdate()
+    {
+        //See above for why this is here.
+        if (!firstSelectionSet)
+        {
+            firstSelectionTimer -= Time.deltaTime;
+            
+            if (firstSelectionTimer <= 0)
+            {
+                firstSelectionSet = true;
+                SetSelection(0);
+            }
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -184,6 +209,16 @@ public class Inventory : MonoBehaviour
         // Otherwise neither slot is filled, do nothing
     }
     
+    public void SetSelection(int n)
+    {
+        currentIndex = n;
+        
+        if (n >= 0 || n <= 6)
+        {
+            selection.transform.position = slots[n].transform.position;
+        }
+    }
+    
     //Say the UI is being interacted with.
     public void Interact()
     {
@@ -193,5 +228,17 @@ public class Inventory : MonoBehaviour
     public bool beingInteractedWith()
     {
         return interactedWith;
+    }
+    
+    public string SelectionName()
+    {
+        InventoryItem item = slots[currentIndex].item;
+        
+        if (item == null)
+        {
+            return "";
+        }
+        
+        return item.name;
     }
 }

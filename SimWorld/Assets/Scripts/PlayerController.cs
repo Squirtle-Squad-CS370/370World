@@ -61,20 +61,43 @@ public class PlayerController : MonoBehaviour
         // animator.SetFloat("Vertical", movement.y);
 
         // Toolbar hotkey functionality - may be encapsulated later?
-        // Press 1 to shoot, 2 to build walls
+        // Press 1 to shoot, 2 to build walls. Now it changes the inventory selection. Not sure how to do this now.
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            MouseManager.Instance.SetCrosshairCursor();
+            //MouseManager.Instance.SetCrosshairCursor();
+            Inventory.Instance.SetSelection(0);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            MouseManager.Instance.SetTileSelectCursor();
+            //MouseManager.Instance.SetTileSelectCursor();
+            Inventory.Instance.SetSelection(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            Inventory.Instance.SetSelection(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            Inventory.Instance.SetSelection(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            Inventory.Instance.SetSelection(4);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            Inventory.Instance.SetSelection(5);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            Inventory.Instance.SetSelection(6);
         }
         
         //shoot on left click
-        //TODO(Skyler): For testing. Needs to check if gun is equiped/has ammo.
+        //TODO(Skyler): For testing. Needs to check if gun is equiped(DONE)/has ammo.
         //TODO(Skyler): Don't shoot when accessing game UI. DONE
-        if (Input.GetMouseButtonDown(0) && canShoot && !Inventory.Instance.beingInteractedWith())
+        if (Inventory.Instance.SelectionName() == "Gun" && Input.GetMouseButtonDown(0) && 
+            canShoot && !Inventory.Instance.beingInteractedWith())
         {
             shoot();
         }
