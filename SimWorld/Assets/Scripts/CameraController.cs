@@ -25,7 +25,7 @@ public class CameraController : MonoBehaviour
     {
         //Added the ability to zoom out just so I can see what the world looks like.
         float scroll = Input.GetAxis ("Mouse ScrollWheel");
-        if (scroll != 0.0f) 
+        if (Input.GetKey(KeyCode.LeftControl) && scroll != 0.0f) 
         {
             targetOrtho -= scroll * zoomSpeed;
              

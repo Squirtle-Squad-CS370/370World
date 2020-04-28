@@ -219,6 +219,11 @@ public class Inventory : MonoBehaviour
         }
     }
     
+    public int GetCurrentSelection()
+    {
+        return currentIndex;
+    }
+    
     //Say the UI is being interacted with.
     public void Interact()
     {
