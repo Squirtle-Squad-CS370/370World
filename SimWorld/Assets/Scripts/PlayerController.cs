@@ -93,6 +93,29 @@ public class PlayerController : MonoBehaviour
             Inventory.Instance.SetSelection(6);
         }
         
+        float scroll = Input.GetAxis ("Mouse ScrollWheel");
+        if (!Input.GetKey(KeyCode.LeftControl) && scroll != 0.0f)
+        {
+            int index = Inventory.Instance.GetCurrentSelection();
+            
+            if (scroll > 0) 
+            {
+                if (++index > 6)
+                {
+                    index = 0;
+                }
+            }
+            else
+            {
+                if (--index < 0)
+                {
+                    index = 6;
+                }
+            }
+            
+            Inventory.Instance.SetSelection(index);
+        }
+        
         //shoot on left click
         //TODO(Skyler): For testing. Needs to check if gun is equiped(DONE)/has ammo.
         //TODO(Skyler): Don't shoot when accessing game UI. DONE
