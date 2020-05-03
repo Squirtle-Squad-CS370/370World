@@ -7,6 +7,11 @@ public class TurretAI : MonoBehaviour
     // Like with animal, I have left these variables blank
     // so that we can set them to different values for
     // different types of turrets.
+    [SerializeField]
+    private GameObject head;
+    [SerializeField]
+    private Transform firePoint;
+
     [Header("Attack Settings")]
     [SerializeField]
     private float attackRange;
@@ -20,8 +25,10 @@ public class TurretAI : MonoBehaviour
     // bulletSpeed will tell our projectile how quickly to move.
     // For now if we set it to 0, our weapon will hitscan instead.
     private float bulletSpeed;
-
-    [Header("Sprite Settings")]
+    [SerializeField]
+    private float rotSpeed; // speed at which the turret will rotate to its target
+    
+    //[Header("Sprite Settings")]
     //[SerializeField]
     //private Sprite bulletSprite;
     [SerializeField]
@@ -34,6 +41,8 @@ public class TurretAI : MonoBehaviour
     private Transform target;
     private bool hasTargetLocked = false;
     private bool canShoot = true;
+
+    private Quaternion targetRotation;
 
     void Start()
     {
@@ -54,6 +63,8 @@ public class TurretAI : MonoBehaviour
 
     void FixedUpdate()
     {
+        RotateHead();
+
         if( ! hasTargetLocked && lockOnTimer > 0 )
         {
             // If timer is set, tick it
@@ -93,6 +104,7 @@ public class TurretAI : MonoBehaviour
         if( hasTargetLocked && target != null && Vector3.Distance( transform.position, target.position ) > attackRange )
         {
             hasTargetLocked = false;
+            target = null;
             Debug.Log(gameObject.name + " is safe... for now.");
         }
     }
@@ -116,17 +128,35 @@ public class TurretAI : MonoBehaviour
         }
     }
 
+    private void RotateHead()
+    {
+        if( target == null )
+        {
+            targetRotation = Quaternion.identity;
+        }
+        else
+        {
+            Vector3 dir = (target.position - head.transform.position).normalized;
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            targetRotation = Quaternion.Euler(0, 0, angle);
+        }
+
+        head.transform.rotation = Quaternion.RotateTowards(head.transform.rotation, targetRotation, rotSpeed * Time.deltaTime);
+    }
+
     private void Shoot()
     {
         if( target == null )
         {
             return;
         }
-
-        Vector3 dir = (target.position - transform.position).normalized;
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
+       
+        /*
+        Vector3 dir = (target.position - firePoint.position).normalized;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         Quaternion rot = Quaternion.Euler(0, 0, angle);
-        
+        */
+
         // With 0 bulletSpeed set, we will hitscan
         if( bulletSpeed == 0 )
         {
@@ -136,7 +166,7 @@ public class TurretAI : MonoBehaviour
         else
         {
             // Create a bullet
-            GameObject bullet = Instantiate(bulletPrefab, transform.position, rot);
+            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, head.transform.rotation);//rot);
             bullet.transform.SetParent(transform);
 
             // Play sfx
@@ -146,7 +176,8 @@ public class TurretAI : MonoBehaviour
             Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<BoxCollider2D>());
 
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
+            //rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
+            rb.AddForce(head.transform.right * bulletSpeed, ForceMode2D.Impulse);
         }      
     }
 }
