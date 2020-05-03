@@ -88,7 +88,8 @@ public class Inventory : MonoBehaviour
     }
 
     // Add an item to the inventory
-    private void AddItem(InventoryItem item)
+    // made public for wall/turret test add
+    public void AddItem(InventoryItem item)
     {
         int itemSlot = -1; // previously was a bool, but this is more useful
 
@@ -268,7 +269,7 @@ public class Inventory : MonoBehaviour
         interactedWith = true;
     }
     
-    public bool beingInteractedWith()
+    public bool BeingInteractedWith()
     {
         return interactedWith;
     }

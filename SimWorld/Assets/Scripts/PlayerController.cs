@@ -37,6 +37,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private GameObject bulletPrefab;
 
+    [Header("TEST Variables")]
+    public GameObject wallPrefab;
+    public GameObject turretPrefab;
+
     // Internal use only
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
@@ -60,6 +64,21 @@ public class PlayerController : MonoBehaviour
     // We collect player input in this method
     void Update()
     {
+        // TEST CONTROLS:
+        if( Input.GetKeyDown(KeyCode.Q))
+        {
+            GameObject tmp_go = Instantiate(wallPrefab);
+            InventoryItem tmpItem = tmp_go.GetComponent<InventoryItem>();
+            Inventory.Instance.AddItem(tmpItem);
+        }
+        if( Input.GetKeyDown(KeyCode.E))
+        {
+            GameObject tmp_go = Instantiate(turretPrefab);
+            InventoryItem tmpItem = tmp_go.GetComponent<InventoryItem>();
+            Inventory.Instance.AddItem(tmpItem);
+        }
+        // end test controls
+
         // Handle shift-to-sprint input
         if (Input.GetKey(KeyCode.LeftShift)) 
         {
@@ -146,7 +165,7 @@ public class PlayerController : MonoBehaviour
         */
 
         // Use selected item on click:
-        if( Input.GetMouseButtonDown(0) && !Inventory.Instance.beingInteractedWith() )
+        if( Input.GetMouseButtonDown(0) && !Inventory.Instance.BeingInteractedWith() )
         {
             if( Inventory.Instance.GetSelectedItem() != null )
             {
