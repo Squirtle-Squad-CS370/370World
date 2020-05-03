@@ -12,6 +12,8 @@ public class Tile
     //TODO: fix public
     public GameObject obj;
 
+    public Installable installedObject = null;
+
     public enum TileType {Empty, Floor, Grass, Water, Dirt, Sand};
     private TileType type = TileType.Empty;
     public bool isWalkable = true;
@@ -115,5 +117,29 @@ public class Tile
     public void setZ(float n)
     {
         z = n;
+    }
+
+    public void Install(Installable installable)
+    {
+        if( installedObject != null )
+        {
+            Debug.Log("Could not install" + installable.name + " because Tile (" + X + ", " + Y + ") already has " + installedObject.name + " installed.");
+            return;
+        }
+
+        installable.OnInstall();
+        installable.transform.position = obj.transform.position;
+        installedObject = installable;
+    }
+    public void Uninstall()
+    {
+        if( installedObject == null )
+        {
+            Debug.Log("Could not Uninstall() from Tile (" + X + ", " + Y + ") because it has no object installed.");
+            return;
+        }
+
+        installedObject.OnUninstall();
+        installedObject = null;
     }
 }

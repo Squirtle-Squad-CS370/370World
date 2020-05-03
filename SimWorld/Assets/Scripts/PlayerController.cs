@@ -2,6 +2,24 @@
 
 public class PlayerController : MonoBehaviour
 {
+    #region Singleton
+
+    public static PlayerController Instance { get; protected set; }
+
+    void Awake()
+    {
+        // Make sure this is the only instance of AudioController
+        if( Instance != null )
+        {
+            Debug.LogError("PlayerController - Another PC already exists.");
+            return;
+        }
+
+        Instance = this;
+    }
+
+    #endregion
+
     [Header("Movement Settings")]
     [SerializeField]
     private const float runSpeed = 8f;
@@ -96,7 +114,7 @@ public class PlayerController : MonoBehaviour
         float scroll = Input.GetAxis ("Mouse ScrollWheel");
         if (!Input.GetKey(KeyCode.LeftControl) && scroll != 0.0f)
         {
-            int index = Inventory.Instance.GetCurrentSelection();
+            int index = Inventory.Instance.GetCurrentSelectionIndex();
             
             if (scroll > 0) 
             {
@@ -116,6 +134,7 @@ public class PlayerController : MonoBehaviour
             Inventory.Instance.SetSelection(index);
         }
         
+        /*
         //shoot on left click
         //TODO(Skyler): For testing. Needs to check if gun is equiped(DONE)/has ammo.
         //TODO(Skyler): Don't shoot when accessing game UI. DONE
@@ -124,7 +143,43 @@ public class PlayerController : MonoBehaviour
         {
             shoot();
         }
-        
+        */
+
+        // Use selected item on click:
+        if( Input.GetMouseButtonDown(0) && !Inventory.Instance.beingInteractedWith() )
+        {
+            if( Inventory.Instance.GetSelectedItem() != null )
+            {
+                InventoryItem selectedItem = Inventory.Instance.GetSelectedItem();
+
+                // If it's a gun, shoot it
+                if( Inventory.Instance.SelectionName() == "Gun" && canShoot )
+                {
+                    Shoot();
+                }
+                // If it's installable, install it
+                else if( selectedItem.GetComponent<Installable>() != null )
+                {
+                    Installable tmpInstallable;
+                    if( selectedItem.quantity > 1 )
+                    {
+                        tmpInstallable = Instantiate(selectedItem).GetComponent<Installable>();
+                    }
+                    else
+                    {
+                        tmpInstallable = selectedItem.GetComponent<Installable>();
+                    }
+
+                    // Unequip();
+
+                    Inventory.Instance.RemoveItem();
+                    tmpInstallable.gameObject.SetActive(true);
+                    MouseManager.Instance.GetTileUnderMouse().Install(tmpInstallable);
+
+                }
+            }
+        }
+
         spriteRenderer.sortingOrder = (int)rb.position.y;
     }
 
@@ -183,7 +238,7 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    private void shoot()
+    private void Shoot()
     {
         canShoot = false;
         shootTimer = timeBetweenShots;
