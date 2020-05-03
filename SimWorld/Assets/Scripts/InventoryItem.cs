@@ -16,7 +16,7 @@ public class InventoryItem : MonoBehaviour
     public Rigidbody2D rb;
     private Collider2D coll;
 
-    private void Start()
+    private void Awake()
     {
         go = gameObject;
         rb = gameObject.GetComponent<Rigidbody2D>();

@@ -29,7 +29,7 @@ public class Inventory : MonoBehaviour
 
     public InventorySlot[] slots;
     private GameObject selection;
-    private int currentIndex = 0;
+    private int selectionIndex = 0;
     //By default the selection starts in the bottom left of the screen.
     //This gives some time so we can set the selection when it is ready.
     //If it is called immediately then it will be on the bottom left of the slot. Kinda janky.
@@ -76,6 +76,11 @@ public class Inventory : MonoBehaviour
         // If we collide with an item, pick it up
         if( collision.gameObject.tag == "Item" )
         {
+            // First check if installed & item capabilities deactivated
+            if( collision.gameObject.GetComponent<InventoryItem>().enabled == false )
+            {
+                return;
+            }
             GameObject itemPickedUp = collision.gameObject;
             InventoryItem item = itemPickedUp.GetComponent<InventoryItem>();
             AddItem(item);
@@ -83,7 +88,8 @@ public class Inventory : MonoBehaviour
     }
 
     // Add an item to the inventory
-    private void AddItem(InventoryItem item)
+    // made public for wall/turret test add
+    public void AddItem(InventoryItem item)
     {
         int itemSlot = -1; // previously was a bool, but this is more useful
 
@@ -97,8 +103,10 @@ public class Inventory : MonoBehaviour
                 {
                     // Add to quantity
                     slots[i].item.quantity += item.quantity;
-                    //itemAdded = true;
-                    itemSlot = i;
+
+                    Destroy(item.gameObject); // free up memory
+
+                    itemSlot = i; // itemAdded = true
 
                     // Item has been added to stack,
                     // so we break out of loop
@@ -151,8 +159,9 @@ public class Inventory : MonoBehaviour
             Debug.Log("Inventory full! Unable to pick up " + item.name + ".");
         }
     }
+
     // Remove an item from the inventory
-    private void RemoveItem(int idx)
+    private void RemoveItem(int idx, int qty = 1)
     {
         if( slots[idx].isEmpty )
         {
@@ -160,16 +169,31 @@ public class Inventory : MonoBehaviour
             return;
         }
 
+        // If only dropping some of stack
+        if( slots[idx].item.quantity > qty )
+        {
+            slots[idx].item.quantity -= qty;
+            slots[idx].UpdateQuantity();
+            return;
+        }
+        // else if attempting to drop more than we have
+        else if( slots[idx].item.quantity < qty )
+        {
+            Debug.Log("Inventory - tried to drop " + qty + " of " + slots[idx].item.name + ", but only have " + slots[idx].item.quantity);
+            return;
+        }
+
         slots[idx].Clear();
     }
+    // If no index is given, remove the highlighted/selected/equipped (whatever) item
+    public void RemoveItem(int qty = 1)
+    {
+        RemoveItem(selectionIndex, qty);
+    }
+
     // Remove item and drop it on the ground
     // If no direction is specified, will throw it randomly
-    public void DropItem(int idx)
-    {
-        Vector3 dir = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized;
-        DropItem(idx, dir);
-    }
-    public void DropItem(int idx, Vector3 dir)
+    public void DropItem(int idx, int qty = 1)
     {
         if( slots[idx].isEmpty )
         {
@@ -177,10 +201,25 @@ public class Inventory : MonoBehaviour
             return;
         }
 
-        slots[idx].item.transform.position = transform.position;
-        slots[idx].item.go.SetActive(true);
-        slots[idx].item.rb.AddForce(dir * 100f, ForceMode2D.Impulse);
-        slots[idx].item.OnDrop();
+        InventoryItem tmpItem;
+
+        if( slots[idx].item.quantity > qty )
+        {
+            tmpItem = Instantiate(slots[idx].item);
+            tmpItem.quantity = qty;
+        }
+        else
+        {
+            tmpItem = slots[idx].item;
+        }
+
+        Vector3 dir = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized;
+
+        tmpItem.transform.position = transform.position;
+        tmpItem.go.SetActive(true);
+        tmpItem.rb.isKinematic = false;
+        tmpItem.rb.AddForce(dir * 100f, ForceMode2D.Impulse);
+        tmpItem.OnDrop();
 
         RemoveItem(idx);
     }
@@ -211,7 +250,7 @@ public class Inventory : MonoBehaviour
     
     public void SetSelection(int n)
     {
-        currentIndex = n;
+        selectionIndex = n;
         
         if (n >= 0 || n <= 6)
         {
@@ -219,9 +258,9 @@ public class Inventory : MonoBehaviour
         }
     }
     
-    public int GetCurrentSelection()
+    public int GetCurrentSelectionIndex()
     {
-        return currentIndex;
+        return selectionIndex;
     }
     
     //Say the UI is being interacted with.
@@ -230,14 +269,14 @@ public class Inventory : MonoBehaviour
         interactedWith = true;
     }
     
-    public bool beingInteractedWith()
+    public bool BeingInteractedWith()
     {
         return interactedWith;
     }
     
     public string SelectionName()
     {
-        InventoryItem item = slots[currentIndex].item;
+        InventoryItem item = slots[selectionIndex].item;
         
         if (item == null)
         {
@@ -245,5 +284,9 @@ public class Inventory : MonoBehaviour
         }
         
         return item.name;
+    }
+    public InventoryItem GetSelectedItem()
+    {
+        return slots[selectionIndex].item;
     }
 }
