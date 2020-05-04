@@ -137,16 +137,16 @@ public class PlayerController : MonoBehaviour
             
             if (scroll > 0) 
             {
-                if (++index > 6)
+                if (--index < 0)
                 {
-                    index = 0;
+                    index = 6;
                 }
             }
             else
             {
-                if (--index < 0)
+                if (++index > 6)
                 {
-                    index = 6;
+                    index = 0;
                 }
             }
             
@@ -191,7 +191,7 @@ public class PlayerController : MonoBehaviour
 
                     // Unequip();
 
-                    Inventory.Instance.RemoveItem();
+                    Inventory.Instance.RemoveItemQty();
                     tmpInstallable.gameObject.SetActive(true);
                     MouseManager.Instance.GetTileUnderMouse().Install(tmpInstallable);
 
