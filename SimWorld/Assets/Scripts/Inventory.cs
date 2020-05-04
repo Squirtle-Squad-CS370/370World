@@ -186,7 +186,7 @@ public class Inventory : MonoBehaviour
         slots[idx].Clear();
     }
     // If no index is given, remove the highlighted/selected/equipped (whatever) item
-    public void RemoveItem(int qty = 1)
+    public void RemoveItemQty(int qty = 1)
     {
         RemoveItem(selectionIndex, qty);
     }

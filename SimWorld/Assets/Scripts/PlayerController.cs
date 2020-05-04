@@ -191,7 +191,7 @@ public class PlayerController : MonoBehaviour
 
                     // Unequip();
 
-                    Inventory.Instance.RemoveItem();
+                    Inventory.Instance.RemoveItemQty();
                     tmpInstallable.gameObject.SetActive(true);
                     MouseManager.Instance.GetTileUnderMouse().Install(tmpInstallable);
 
