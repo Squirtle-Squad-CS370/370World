@@ -147,6 +147,23 @@ public class TurretAI : MonoBehaviour
             }
         }
     }
+    
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (target != null && targets.Count != 0)
+        {
+            return;
+        }
+        
+        if (collision.tag == "Enemy")
+        {
+            Transform newTarget = collision.transform;
+            if (!targets.Contains(newTarget))
+            {
+                targets.Add(newTarget);
+            }
+        }
+    }
 
     private void RotateHead()
     {
