@@ -35,6 +35,14 @@ public class StoryTeller : MonoBehaviour
         spawnStarterItems();
     }
     
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            spawnEnemy();
+        }
+    }
+    
     //Get a spawn pos relative to the player. If fuzzy is true it will add a little more randomness, good for spawning many things in one spot.
     private Vector3 getSpawnPos(int closeDist, int farDist, bool fuzzy = true)
     {
@@ -53,6 +61,11 @@ public class StoryTeller : MonoBehaviour
         Instantiate(gunPrefab, getSpawnPos(2, 3, false), Quaternion.identity);
     }
     
+    private void spawnEnemy()
+    {
+        Instantiate(enemyPrefab, getSpawnPos(20, 30), Quaternion.identity);
+    }
+    
     IEnumerator doRaid()
     {
         while (true)
@@ -65,7 +78,7 @@ public class StoryTeller : MonoBehaviour
                 
                 for (int i = 0; i < numEnemies; ++i)
                 {
-                    Instantiate(enemyPrefab, getSpawnPos(20, 30), Quaternion.identity);
+                    spawnEnemy();
                 }
             }
             else
