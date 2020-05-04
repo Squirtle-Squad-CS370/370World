@@ -65,7 +65,7 @@ public class MouseManager : MonoBehaviour
         if( isTileSelect )
         {
             // Update the tile select cursor's position
-            Tile tileUnderMouse = WorldController.Instance.GetTileAtWorldCoord(currFramePosition);
+            Tile tileUnderMouse = GetTileUnderMouse();
             if (tileUnderMouse != null)
             {
                 cursor_go.SetActive(true);
@@ -95,5 +95,10 @@ public class MouseManager : MonoBehaviour
 
         isTileSelect = true;
         isCrosshair = false;
+    }
+
+    public Tile GetTileUnderMouse()
+    {
+        return WorldController.Instance.GetTileAtWorldCoord(currFramePosition);
     }
 }

@@ -2,6 +2,24 @@
 
 public class PlayerController : MonoBehaviour
 {
+    #region Singleton
+
+    public static PlayerController Instance { get; protected set; }
+
+    void Awake()
+    {
+        // Make sure this is the only instance of AudioController
+        if( Instance != null )
+        {
+            Debug.LogError("PlayerController - Another PC already exists.");
+            return;
+        }
+
+        Instance = this;
+    }
+
+    #endregion
+
     [Header("Movement Settings")]
     [SerializeField]
     private const float runSpeed = 8f;
@@ -18,6 +36,10 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField]
     private GameObject bulletPrefab;
+
+    [Header("TEST Variables")]
+    public GameObject wallPrefab;
+    public GameObject turretPrefab;
 
     // Internal use only
     private Rigidbody2D rb;
@@ -42,6 +64,21 @@ public class PlayerController : MonoBehaviour
     // We collect player input in this method
     void Update()
     {
+        // TEST CONTROLS:
+        if( Input.GetKeyDown(KeyCode.Q))
+        {
+            GameObject tmp_go = Instantiate(wallPrefab);
+            InventoryItem tmpItem = tmp_go.GetComponent<InventoryItem>();
+            Inventory.Instance.AddItem(tmpItem);
+        }
+        if( Input.GetKeyDown(KeyCode.E))
+        {
+            GameObject tmp_go = Instantiate(turretPrefab);
+            InventoryItem tmpItem = tmp_go.GetComponent<InventoryItem>();
+            Inventory.Instance.AddItem(tmpItem);
+        }
+        // end test controls
+
         // Handle shift-to-sprint input
         if (Input.GetKey(KeyCode.LeftShift)) 
         {
@@ -61,24 +98,107 @@ public class PlayerController : MonoBehaviour
         // animator.SetFloat("Vertical", movement.y);
 
         // Toolbar hotkey functionality - may be encapsulated later?
-        // Press 1 to shoot, 2 to build walls
+        // Press 1 to shoot, 2 to build walls. Now it changes the inventory selection. Not sure how to do this now.
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            MouseManager.Instance.SetCrosshairCursor();
+            //MouseManager.Instance.SetCrosshairCursor();
+            Inventory.Instance.SetSelection(0);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            MouseManager.Instance.SetTileSelectCursor();
+            //MouseManager.Instance.SetTileSelectCursor();
+            Inventory.Instance.SetSelection(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            Inventory.Instance.SetSelection(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            Inventory.Instance.SetSelection(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            Inventory.Instance.SetSelection(4);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            Inventory.Instance.SetSelection(5);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            Inventory.Instance.SetSelection(6);
         }
         
+        float scroll = Input.GetAxis ("Mouse ScrollWheel");
+        if (!Input.GetKey(KeyCode.LeftControl) && scroll != 0.0f)
+        {
+            int index = Inventory.Instance.GetCurrentSelectionIndex();
+            
+            if (scroll > 0) 
+            {
+                if (++index > 6)
+                {
+                    index = 0;
+                }
+            }
+            else
+            {
+                if (--index < 0)
+                {
+                    index = 6;
+                }
+            }
+            
+            Inventory.Instance.SetSelection(index);
+        }
+        
+        /*
         //shoot on left click
-        //TODO(Skyler): For testing. Needs to check if gun is equiped/has ammo.
+        //TODO(Skyler): For testing. Needs to check if gun is equiped(DONE)/has ammo.
         //TODO(Skyler): Don't shoot when accessing game UI. DONE
-        if (Input.GetMouseButtonDown(0) && canShoot && !Inventory.Instance.beingInteractedWith())
+        if (Inventory.Instance.SelectionName() == "Gun" && Input.GetMouseButtonDown(0) && 
+            canShoot && !Inventory.Instance.beingInteractedWith())
         {
             shoot();
         }
-        
+        */
+
+        // Use selected item on click:
+        if( Input.GetMouseButtonDown(0) && !Inventory.Instance.BeingInteractedWith() )
+        {
+            if( Inventory.Instance.GetSelectedItem() != null )
+            {
+                InventoryItem selectedItem = Inventory.Instance.GetSelectedItem();
+
+                // If it's a gun, shoot it
+                if( Inventory.Instance.SelectionName() == "Gun" && canShoot )
+                {
+                    Shoot();
+                }
+                // If it's installable, install it
+                else if( selectedItem.GetComponent<Installable>() != null )
+                {
+                    Installable tmpInstallable;
+                    if( selectedItem.quantity > 1 )
+                    {
+                        tmpInstallable = Instantiate(selectedItem).GetComponent<Installable>();
+                    }
+                    else
+                    {
+                        tmpInstallable = selectedItem.GetComponent<Installable>();
+                    }
+
+                    // Unequip();
+
+                    Inventory.Instance.RemoveItem();
+                    tmpInstallable.gameObject.SetActive(true);
+                    MouseManager.Instance.GetTileUnderMouse().Install(tmpInstallable);
+
+                }
+            }
+        }
+
         spriteRenderer.sortingOrder = (int)rb.position.y;
     }
 
@@ -137,7 +257,7 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    private void shoot()
+    private void Shoot()
     {
         canShoot = false;
         shootTimer = timeBetweenShots;
