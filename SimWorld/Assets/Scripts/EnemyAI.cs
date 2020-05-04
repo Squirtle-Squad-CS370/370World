@@ -9,7 +9,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField]
     private bool isRanged = true;
     [SerializeField]
-    private float range = 6; //How close the enemy will get to the player before shooting.
+    private float range = 5; //How close the enemy will get to the player before shooting.
     
     private Vector3 targetPosition;
     private GameObject player;
