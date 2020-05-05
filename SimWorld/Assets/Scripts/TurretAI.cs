@@ -38,7 +38,10 @@ public class TurretAI : MonoBehaviour
     public AudioClip ac_targetLock;
     public AudioClip ac_shoot;
 
-    private Transform target;
+    [SerializeField]
+    private List<Transform> targets;
+    [SerializeField]
+    private Transform target = null;
     private bool hasTargetLocked = false;
     private bool canShoot = true;
 
@@ -59,11 +62,19 @@ public class TurretAI : MonoBehaviour
             this.enabled = false;
             GetComponent<InventoryItem>().enabled = true;
         }
+        
+        targets = new List<Transform>();
     }
 
     void FixedUpdate()
     {
         RotateHead();
+        
+        //Lock on if there is a valid target.
+        if (GetNextTarget())
+        {
+            LockOn();
+        }
 
         if( ! hasTargetLocked && lockOnTimer > 0 )
         {
@@ -103,9 +114,16 @@ public class TurretAI : MonoBehaviour
         // If target goes out of range
         if( hasTargetLocked && target != null && Vector3.Distance( transform.position, target.position ) > attackRange )
         {
-            hasTargetLocked = false;
+            targets.Remove(target);
             target = null;
-            Debug.Log(gameObject.name + " is safe... for now.");
+            
+            //If there is no next target set lock to false.
+            if (!GetNextTarget())
+            {
+                hasTargetLocked = false;
+            }
+            
+            //Debug.Log(gameObject.name + " is safe... for now.");
         }
     }
 
@@ -122,9 +140,28 @@ public class TurretAI : MonoBehaviour
         // If we've found an enemy, target acquired
         if ( collision.tag == "Enemy" )
         {
-            lockOnTimer = timeToLockTarget;
-            AudioController.Instance.PlaySound(ac_targetLock, transform.position);
-            target = collision.transform;
+            Transform newTarget = collision.transform;
+            if (!targets.Contains(newTarget))
+            {
+                targets.Add(newTarget);
+            }
+        }
+    }
+    
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (target != null && targets.Count != 0)
+        {
+            return;
+        }
+        
+        if (collision.tag == "Enemy")
+        {
+            Transform newTarget = collision.transform;
+            if (!targets.Contains(newTarget))
+            {
+                targets.Add(newTarget);
+            }
         }
     }
 
@@ -179,5 +216,42 @@ public class TurretAI : MonoBehaviour
             //rb.AddForce(dir * bulletSpeed, ForceMode2D.Impulse);
             rb.AddForce(head.transform.right * bulletSpeed, ForceMode2D.Impulse);
         }      
+    }
+    
+    //Return true if target found, false if no target found.
+    private bool GetNextTarget()
+    {
+        //Don't change anything if we already have a valid target.
+        if (target != null)
+        {
+            return false;
+        }
+        
+        while (targets.Count > 0 && targets[0] == null) 
+        {
+            targets.RemoveAt(0);
+        }
+        
+        if (targets.Count > 0)
+        {
+            if (target == targets[0])
+            {
+                return false;
+            }
+            
+            target = targets[0];
+            return true;
+        }
+        else
+        {
+            target = null;
+            return false;
+        }
+    }
+    
+    private void LockOn()
+    {
+        lockOnTimer = timeToLockTarget;
+        AudioController.Instance.PlaySound(ac_targetLock, transform.position);
     }
 }

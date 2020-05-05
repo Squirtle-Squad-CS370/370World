@@ -102,7 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   head: {fileID: 4826074792795881769}
   firePoint: {fileID: 4534183904337048061}
-  attackRange: 5
+  attackRange: 6
   timeToLockTarget: 1.5
   timeBetweenAttacks: 1.2
   bulletSpeed: 6
@@ -111,6 +111,8 @@ MonoBehaviour:
     type: 3}
   ac_targetLock: {fileID: 8300000, guid: 0b6328b7d19b5a943bb0b3db81651369, type: 3}
   ac_shoot: {fileID: 8300000, guid: 49f7480278edfa3468cc76403d364986, type: 3}
+  targets: []
+  target: {fileID: 0}
 --- !u!58 &1228459731817008253
 CircleCollider2D:
   m_ObjectHideFlags: 0

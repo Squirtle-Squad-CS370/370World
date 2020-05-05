@@ -152,17 +152,6 @@ public class PlayerController : MonoBehaviour
             
             Inventory.Instance.SetSelection(index);
         }
-        
-        /*
-        //shoot on left click
-        //TODO(Skyler): For testing. Needs to check if gun is equiped(DONE)/has ammo.
-        //TODO(Skyler): Don't shoot when accessing game UI. DONE
-        if (Inventory.Instance.SelectionName() == "Gun" && Input.GetMouseButtonDown(0) && 
-            canShoot && !Inventory.Instance.beingInteractedWith())
-        {
-            shoot();
-        }
-        */
 
         // Use selected item on click:
         if( Input.GetMouseButtonDown(0) && !Inventory.Instance.BeingInteractedWith() )
